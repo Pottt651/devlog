@@ -11,6 +11,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   const projects = results.map((r: any) => ({
     ...r,
     recent_commits: JSON.parse(r.recent_commits || "[]"),
+    links: JSON.parse(r.links || "{}"),
   }));
 
   return Response.json(projects);

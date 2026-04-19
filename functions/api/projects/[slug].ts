@@ -16,5 +16,6 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
   return Response.json({
     ...project,
     recent_commits: JSON.parse((project as any).recent_commits || "[]"),
+    links: JSON.parse((project as any).links || "{}"),
   });
 };

@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS projects (
   claude_sessions INTEGER DEFAULT 0,
   claude_messages INTEGER DEFAULT 0,
   recent_commits TEXT DEFAULT '[]',
+  links TEXT DEFAULT '{}',
   scanned_at TEXT DEFAULT (datetime('now')),
   created_at TEXT DEFAULT (datetime('now'))
 );

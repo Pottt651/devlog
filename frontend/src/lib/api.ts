@@ -25,6 +25,7 @@ export interface Project {
   claude_sessions: number;
   claude_messages: number;
   recent_commits: { hash: string; subject: string; date: string }[];
+  links: { live?: string; github?: string };
   scanned_at: string;
 }
 

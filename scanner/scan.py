@@ -27,6 +27,141 @@ def run_git(repo_path: Path, *args) -> str:
         return ""
 
 
+# 手工补充的项目信息（CLAUDE.md/README.md 缺失或不够清晰的项目）
+PROJECT_INFO = {
+    "etf-live-trading": {
+        "name": "ETF 实盘交易系统",
+        "description": "ETF 动量轮动策略的实盘看板 + 信号计算系统。通过 QMT 接入 A 股账户数据，展示持仓、收益、调仓信号。每周五自动计算轮动信号，部署在 Cloudflare Pages 上可随时查看。",
+        "links": {"live": "https://etf-live-trading.pages.dev", "github": "https://github.com/Pottt651/etf-live-trading"}
+    },
+    "ibkr": {
+        "name": "IBKR 美股账户终端",
+        "description": "盈透证券（Interactive Brokers）美股账户的只读监控终端。通过 Flex Query 获取持仓、交易、收益等数据，FastAPI 后端 + React 前端，Claude.ai 设计风格。支持离线查看历史数据。",
+        "links": {"github": "https://github.com/Pottt651/ibkr-terminal"}
+    },
+    "fund_huice": {
+        "name": "ETF 动量回测引擎",
+        "description": "ETF 动量轮动策略的回测系统。实现了完整的 Walk-Forward Optimization、Bootstrap 检验、Bonferroni 校正等严格的策略验证流程。v2.1 引擎修复后识别出原策略存在方法论假阳性。",
+        "links": {"github": "https://github.com/Pottt651/fund_huice"}
+    },
+    "fund_huice_codex": {
+        "name": "ETF 动量回测 + 实盘",
+        "description": "ETF 动量轮动策略回测与实盘系统（Codex 协作版）。在 fund_huice 基础上完成策略定型，准备实盘部署。包含回测引擎、信号生成、数据管道等完整链路。",
+        "links": {"github": "https://github.com/Pottt651/fund-huice-codex"}
+    },
+    "alphamath_claude": {
+        "name": "AlphaMath 数学教学分析",
+        "description": "面向上海高中数学教学的数据分析工具。对近三年上海高考、春考、一模二模试卷进行知识点标注、题型分类和趋势分析，用于指导学生备考。Claude Code 深度协作完成。",
+        "links": {"live": "https://alphamath-teacher-os.pages.dev", "github": "https://github.com/Pottt651/alphamath-teacher-os"}
+    },
+    "AlphaMath": {
+        "name": "AlphaMath 原型",
+        "description": "AlphaMath 项目的早期原型，后续迁移到 alphamath_claude 继续开发。",
+        "links": {"github": "https://github.com/Pottt651/AlphaMath"}
+    },
+    "erdos": {
+        "name": "数学试卷数据源",
+        "description": "上海数学考试试卷的数据采集与整理项目。从 GitHub 数据源抓取试卷，进行 OCR 识别和规范化命名归档，为 AlphaMath 分析项目提供数据基础。",
+        "links": {}
+    },
+    "favorites-digest": {
+        "name": "收藏夹知识归档",
+        "description": "B站和小红书收藏夹内容的转录与知识归档系统。视频通过 Whisper 转录，图文笔记通过 OCR 识别，最终按主题归类整理成个人知识库看板。",
+        "links": {}
+    },
+    "cashpilot": {
+        "name": "个人全资产管理",
+        "description": "个人可支配资金的全方位管理工具。涵盖投资账户、月度收入、日常开销等所有资金流动。支持数据导入和手动输入，FastAPI + React 全栈架构。项目刚启动。",
+        "links": {}
+    },
+    "nassdaq": {
+        "name": "纳指 ETF 相对估值研究",
+        "description": "面向 A 股场内纳斯达克100 ETF 的相对估值切换研究。通过 miniQMT 日线数据做代理版相对估值回测，研究 ETF 之间的切换时机和阈值。",
+        "links": {}
+    },
+    "qmt": {
+        "name": "QMT 量化交易接口",
+        "description": "通过 QMT（迅投 miniQMT）接入 A 股券商账户的数据通道。提供持仓查询、交易记录获取、实时行情等功能，作为 etf-live-trading 项目的数据源。",
+        "links": {}
+    },
+    "ghostfolio-ibkr": {
+        "name": "Ghostfolio 投资组合尝试",
+        "description": "尝试使用开源投资组合管理软件 Ghostfolio 来管理 IBKR 账户数据。经评估后放弃，回归自建 ibkr 项目。",
+        "links": {}
+    },
+}
+
+
+def extract_project_info(project_dir: Path, slug: str) -> tuple:
+    """从 CLAUDE.md / README.md 提取项目名、简介和链接，优先使用手工补充信息"""
+    # 手工补充优先
+    if slug in PROJECT_INFO:
+        pi = PROJECT_INFO[slug]
+        return pi["name"], pi["description"], pi.get("links", {})
+
+    # 尝试从文件提取
+    name = slug
+    description = ""
+    for doc_file in ["CLAUDE.md", "README.md"]:
+        doc_path = project_dir / doc_file
+        if not doc_path.exists():
+            continue
+        try:
+            text = doc_path.read_text(encoding="utf-8", errors="replace")
+            lines = text.split("\n")
+
+            # 提取标题
+            for line in lines:
+                if line.startswith("#") and not line.startswith("##"):
+                    candidate = line.lstrip("#").strip()
+                    # 去掉 "CLAUDE.md —" 前缀
+                    if "—" in candidate:
+                        candidate = candidate.split("—", 1)[1].strip()
+                    if candidate:
+                        name = candidate
+                    break
+
+            # 提取"一句话总结"
+            for i, line in enumerate(lines):
+                if "一句话总结" in line or "总结" in line:
+                    for j in range(i + 1, min(i + 4, len(lines))):
+                        candidate = lines[j].strip()
+                        if candidate and not candidate.startswith("#") and not candidate.startswith("-"):
+                            description = candidate
+                            break
+                    break
+
+            # fallback: 取第一段非标题、非空行
+            if not description:
+                for line in lines:
+                    stripped = line.strip()
+                    if stripped and not stripped.startswith("#") and not stripped.startswith(">") and not stripped.startswith("-") and not stripped.startswith("```") and len(stripped) > 20:
+                        description = stripped[:200]
+                        break
+
+            if name != slug:
+                break
+        except Exception:
+            pass
+
+    # 尝试自动发现 git remote URL
+    links = {}
+    try:
+        remote = subprocess.run(
+            ["git", "-C", str(project_dir), "remote", "get-url", "origin"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=5
+        ).stdout.strip()
+        if remote:
+            # 转换为 HTTPS 浏览器 URL
+            if remote.endswith(".git"):
+                remote = remote[:-4]
+            links["github"] = remote
+    except Exception:
+        pass
+
+    return name, description or f"{slug} 项目", links
+
+
 def scan_git_projects() -> dict:
     """扫描 quant/ 下所有 git 项目"""
     projects = {}
@@ -61,22 +196,8 @@ def scan_git_projects() -> dict:
         if del_match:
             lines_removed = int(del_match.group(1))
 
-        # 项目名：尝试从 README 或 CLAUDE.md 提取
-        name = slug
-        for readme in ["README.md", "CLAUDE.md"]:
-            readme_path = item / readme
-            if readme_path.exists():
-                try:
-                    first_line = readme_path.read_text(encoding="utf-8", errors="replace").split("\n")[0]
-                    if first_line.startswith("#"):
-                        name = first_line.lstrip("#").strip()
-                        break
-                except Exception:
-                    pass
-
-        # 描述：从最近的 commit subjects 生成
-        recent_subjects = [c["subject"] for c in commits[:10]]
-        description = "; ".join(recent_subjects)
+        # 从 CLAUDE.md / README.md 提取项目名、简介和链接
+        name, description, links = extract_project_info(item, slug)
 
         projects[slug] = {
             "slug": slug,
@@ -90,6 +211,7 @@ def scan_git_projects() -> dict:
             "lines_added": lines_added,
             "lines_removed": lines_removed,
             "recent_commits": commits[:20],
+            "links": links,
         }
     return projects
 
@@ -161,10 +283,11 @@ def scan_claude_history(projects: dict) -> dict:
             projects[slug]["claude_messages"] = info["messages"]
         else:
             # 无 git 的项目，仅从 Claude 历史中发现
+            pi = PROJECT_INFO.get(slug, {})
             projects[slug] = {
                 "slug": slug,
-                "name": slug,
-                "description": f"Claude Code 会话项目 ({info['messages']} 条消息)",
+                "name": pi.get("name", slug),
+                "description": pi.get("description", f"{slug} 项目"),
                 "status": "active" if info["last"] and (datetime.now() - info["last"]).days < 7 else "paused",
                 "total_commits": 0,
                 "first_commit_at": info["first"].isoformat() if info["first"] else None,
@@ -175,6 +298,7 @@ def scan_claude_history(projects: dict) -> dict:
                 "claude_sessions": len(info["sessions"]),
                 "claude_messages": info["messages"],
                 "recent_commits": [],
+                "links": pi.get("links", {}),
             }
 
     return projects
@@ -186,20 +310,22 @@ def push_to_d1(projects: dict):
 
     for p in projects.values():
         recent = json.dumps(p.get("recent_commits", []), ensure_ascii=False)
+        links = json.dumps(p.get("links", {}), ensure_ascii=False)
         # 转义单引号
         name = p["name"].replace("'", "''")
         desc = p["description"].replace("'", "''")
         recent_escaped = recent.replace("'", "''")
+        links_escaped = links.replace("'", "''")
 
         sql = (
             f"INSERT INTO projects (slug, name, description, status, total_commits, "
             f"first_commit_at, last_commit_at, files_changed, lines_added, lines_removed, "
-            f"claude_sessions, claude_messages, recent_commits, scanned_at) VALUES ("
+            f"claude_sessions, claude_messages, recent_commits, links, scanned_at) VALUES ("
             f"'{p['slug']}', '{name}', '{desc}', '{p['status']}', {p['total_commits']}, "
             f"'{p.get('first_commit_at', '')}', '{p.get('last_commit_at', '')}', "
             f"{p['files_changed']}, {p['lines_added']}, {p['lines_removed']}, "
             f"{p.get('claude_sessions', 0)}, {p.get('claude_messages', 0)}, "
-            f"'{recent_escaped}', datetime('now'));"
+            f"'{recent_escaped}', '{links_escaped}', datetime('now'));"
         )
         statements.append(sql)
 
