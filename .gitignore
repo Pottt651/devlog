@@ -1,0 +1,8 @@
+node_modules/
+frontend/dist/
+frontend/node_modules/
+scanner/__pycache__/
+scanner/_push.sql
+scanner/.env
+.wrangler/
+*.pyc

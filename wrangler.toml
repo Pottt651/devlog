@@ -1,0 +1,8 @@
+name = "devlog"
+compatibility_date = "2026-04-19"
+pages_build_output_dir = "./frontend/dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "devlog-db"
+database_id = "38c88088-af40-4168-83b2-d73f079d8bae"
