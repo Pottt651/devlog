@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate } from "react-router-dom";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
+import ProjectNew from "./pages/ProjectNew";
 import Diary from "./pages/Diary";
 import DiaryEdit from "./pages/DiaryEdit";
 import "./App.css";
@@ -35,6 +36,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/projects" replace />} />
             <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/new" element={<ProjectNew />} />
             <Route path="/projects/:slug" element={<ProjectDetail />} />
             <Route path="/diary" element={<Diary />} />
             <Route path="/diary/new" element={<DiaryEdit />} />

@@ -26,6 +26,13 @@ export interface Project {
   claude_messages: number;
   recent_commits: { hash: string; subject: string; date: string }[];
   links: { live?: string; github?: string };
+  tech_stack: string[];
+  related_projects: string[];
+  local_path: string;
+  has_claude_md: boolean;
+  claude_resume_cmd: string;
+  is_manual: boolean;
+  notes: string;
   scanned_at: string;
 }
 
@@ -41,6 +48,10 @@ export interface DiaryEntry {
 export const api = {
   getProjects: () => request<Project[]>("/projects"),
   getProject: (slug: string) => request<Project>(`/projects/${slug}`),
+  createProject: (body: { slug: string; name: string; description?: string; tech_stack?: string[]; notes?: string }) =>
+    request<Project>("/projects", { method: "POST", body: JSON.stringify(body) }),
+  updateProjectNotes: (slug: string, notes: string) =>
+    request<void>(`/projects/${slug}`, { method: "PUT", body: JSON.stringify({ notes }) }),
 
   getDiaryEntries: (tag?: string) =>
     request<DiaryEntry[]>(`/diary${tag ? `?tag=${tag}` : ""}`),

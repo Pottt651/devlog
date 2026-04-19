@@ -16,6 +16,13 @@ CREATE TABLE IF NOT EXISTS projects (
   claude_messages INTEGER DEFAULT 0,
   recent_commits TEXT DEFAULT '[]',
   links TEXT DEFAULT '{}',
+  tech_stack TEXT DEFAULT '[]',
+  related_projects TEXT DEFAULT '[]',
+  local_path TEXT DEFAULT '',
+  has_claude_md INTEGER DEFAULT 0,
+  is_manual INTEGER DEFAULT 0,
+  claude_resume_cmd TEXT DEFAULT '',
+  notes TEXT DEFAULT '',
   scanned_at TEXT DEFAULT (datetime('now')),
   created_at TEXT DEFAULT (datetime('now'))
 );

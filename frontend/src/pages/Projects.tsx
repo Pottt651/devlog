@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api, type Project } from "../lib/api";
 
 function formatShortDate(iso: string) {
@@ -8,16 +8,8 @@ function formatShortDate(iso: string) {
 }
 
 function StatusDot({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    active: "#16a34a",
-    paused: "#ca8a04",
-    archived: "#9ca3af",
-  };
-  const labels: Record<string, string> = {
-    active: "进行中",
-    paused: "已暂停",
-    archived: "已归档",
-  };
+  const colors: Record<string, string> = { active: "#16a34a", paused: "#ca8a04", idea: "#6366f1", archived: "#9ca3af" };
+  const labels: Record<string, string> = { active: "进行中", paused: "已暂停", idea: "灵感", archived: "已归档" };
   return (
     <span className="status-dot-wrap">
       <span className="status-dot" style={{ background: colors[status] || "#9ca3af" }} />
@@ -26,11 +18,11 @@ function StatusDot({ status }: { status: string }) {
   );
 }
 
-
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const navigate = useNavigate();
 
   useEffect(() => {
     api.getProjects().then(setProjects).finally(() => setLoading(false));
@@ -44,27 +36,28 @@ export default function Projects() {
     <div className="page">
       <div className="page-header">
         <h1>项目</h1>
-        <div className="filter-bar">
-          {["all", "active", "paused"].map((f) => (
-            <button
-              key={f}
-              className={`filter-btn ${filter === f ? "active" : ""}`}
-              onClick={() => setFilter(f)}
-            >
-              {f === "all" ? "全部" : f === "active" ? "进行中" : "已暂停"}
-              {f !== "all" && ` (${projects.filter((p) => p.status === f).length})`}
-            </button>
-          ))}
+        <div className="header-actions">
+          <div className="filter-bar">
+            {["all", "active", "paused", "idea"].map((f) => (
+              <button
+                key={f}
+                className={`filter-btn ${filter === f ? "active" : ""}`}
+                onClick={() => setFilter(f)}
+              >
+                {f === "all" ? "全部" : f === "active" ? "进行中" : f === "paused" ? "已暂停" : "灵感"}
+                {f !== "all" && ` (${projects.filter((p) => p.status === f).length})`}
+              </button>
+            ))}
+          </div>
+          <button className="btn btn-primary btn-sm" onClick={() => navigate("/projects/new")}>
+            + 新建项目
+          </button>
         </div>
       </div>
 
       <div className="projects-list">
         {filtered.map((project) => (
-          <Link
-            to={`/projects/${project.slug}`}
-            key={project.slug}
-            className="project-card-report"
-          >
+          <Link to={`/projects/${project.slug}`} key={project.slug} className="project-card-report">
             <div className="report-top">
               <h2 className="report-title">{project.name}</h2>
               <StatusDot status={project.status} />
@@ -72,18 +65,24 @@ export default function Projects() {
 
             <p className="report-desc">{project.description}</p>
 
+            {project.tech_stack?.length > 0 && (
+              <div className="tech-tags">
+                {project.tech_stack.map((t) => (
+                  <span key={t} className="tech-tag">{t}</span>
+                ))}
+              </div>
+            )}
+
             <div className="report-meta">
               <span>{formatShortDate(project.first_commit_at)} — {formatShortDate(project.last_commit_at)}</span>
               {project.total_commits > 0 && <span>{project.total_commits} 次提交</span>}
               {project.claude_sessions > 0 && <span>{project.claude_sessions} 次 AI 协作</span>}
             </div>
 
-            {project.recent_commits.length > 0 && (
+            {project.recent_commits?.length > 0 && (
               <div className="report-progress">
                 <span className="progress-label">最近进展</span>
-                <span className="progress-text">
-                  {project.recent_commits[0].subject}
-                </span>
+                <span className="progress-text">{project.recent_commits[0].subject}</span>
               </div>
             )}
 

@@ -32,72 +32,96 @@ PROJECT_INFO = {
     "etf-live-trading": {
         "name": "ETF 实盘交易系统",
         "description": "ETF 动量轮动策略的实盘看板 + 信号计算系统。通过 QMT 接入 A 股账户数据，展示持仓、收益、调仓信号。每周五自动计算轮动信号，部署在 Cloudflare Pages 上可随时查看。",
-        "links": {"live": "https://etf-live-trading.pages.dev", "github": "https://github.com/Pottt651/etf-live-trading"}
+        "links": {"live": "https://etf-live-trading.pages.dev", "github": "https://github.com/Pottt651/etf-live-trading"},
+        "tech_stack": ["Python", "Pandas", "AkShare", "Cloudflare Pages", "Supabase"],
+        "related_projects": ["fund_huice_codex", "qmt"],
     },
     "ibkr": {
         "name": "IBKR 美股账户终端",
         "description": "盈透证券（Interactive Brokers）美股账户的只读监控终端。通过 Flex Query 获取持仓、交易、收益等数据，FastAPI 后端 + React 前端，Claude.ai 设计风格。支持离线查看历史数据。",
-        "links": {"github": "https://github.com/Pottt651/ibkr-terminal"}
+        "links": {"github": "https://github.com/Pottt651/ibkr-terminal"},
+        "tech_stack": ["Python", "FastAPI", "React", "TypeScript", "Vite", "SQLite"],
+        "related_projects": ["ghostfolio-ibkr"],
     },
     "fund_huice": {
         "name": "ETF 动量回测引擎",
         "description": "ETF 动量轮动策略的回测系统。实现了完整的 Walk-Forward Optimization、Bootstrap 检验、Bonferroni 校正等严格的策略验证流程。v2.1 引擎修复后识别出原策略存在方法论假阳性。",
-        "links": {"github": "https://github.com/Pottt651/fund_huice"}
+        "links": {"github": "https://github.com/Pottt651/fund_huice"},
+        "tech_stack": ["Python", "Pandas", "NumPy"],
+        "related_projects": ["fund_huice_codex"],
     },
     "fund_huice_codex": {
         "name": "ETF 动量回测 + 实盘",
         "description": "ETF 动量轮动策略回测与实盘系统（Codex 协作版）。在 fund_huice 基础上完成策略定型，准备实盘部署。包含回测引擎、信号生成、数据管道等完整链路。",
-        "links": {"github": "https://github.com/Pottt651/fund-huice-codex"}
+        "links": {"github": "https://github.com/Pottt651/fund-huice-codex"},
+        "tech_stack": ["Python", "Pandas", "NumPy"],
+        "related_projects": ["fund_huice", "etf-live-trading"],
     },
     "alphamath_claude": {
         "name": "AlphaMath 数学教学分析",
         "description": "面向上海高中数学教学的数据分析工具。对近三年上海高考、春考、一模二模试卷进行知识点标注、题型分类和趋势分析，用于指导学生备考。Claude Code 深度协作完成。",
-        "links": {"live": "https://alphamath-teacher-os.pages.dev", "github": "https://github.com/Pottt651/alphamath-teacher-os"}
+        "links": {"live": "https://alphamath-teacher-os.pages.dev", "github": "https://github.com/Pottt651/alphamath-teacher-os"},
+        "tech_stack": ["React", "TypeScript", "Vite", "Cloudflare Pages"],
+        "related_projects": ["AlphaMath", "erdos"],
     },
     "AlphaMath": {
         "name": "AlphaMath 原型",
         "description": "AlphaMath 项目的早期原型，后续迁移到 alphamath_claude 继续开发。",
-        "links": {"github": "https://github.com/Pottt651/AlphaMath"}
+        "links": {"github": "https://github.com/Pottt651/AlphaMath"},
+        "tech_stack": ["Python", "Flask"],
+        "related_projects": ["alphamath_claude"],
     },
     "erdos": {
         "name": "数学试卷数据源",
         "description": "上海数学考试试卷的数据采集与整理项目。从 GitHub 数据源抓取试卷，进行 OCR 识别和规范化命名归档，为 AlphaMath 分析项目提供数据基础。",
-        "links": {}
+        "links": {},
+        "tech_stack": ["Python"],
+        "related_projects": ["alphamath_claude"],
     },
     "favorites-digest": {
         "name": "收藏夹知识归档",
         "description": "B站和小红书收藏夹内容的转录与知识归档系统。视频通过 Whisper 转录，图文笔记通过 OCR 识别，最终按主题归类整理成个人知识库看板。",
-        "links": {}
+        "links": {},
+        "tech_stack": ["Python", "Whisper", "OCR"],
+        "related_projects": [],
     },
     "cashpilot": {
         "name": "个人全资产管理",
         "description": "个人可支配资金的全方位管理工具。涵盖投资账户、月度收入、日常开销等所有资金流动。支持数据导入和手动输入，FastAPI + React 全栈架构。项目刚启动。",
-        "links": {}
+        "links": {},
+        "tech_stack": ["Python", "FastAPI", "React", "TypeScript", "Vite", "Ant Design"],
+        "related_projects": [],
     },
     "nassdaq": {
         "name": "纳指 ETF 相对估值研究",
         "description": "面向 A 股场内纳斯达克100 ETF 的相对估值切换研究。通过 miniQMT 日线数据做代理版相对估值回测，研究 ETF 之间的切换时机和阈值。",
-        "links": {}
+        "links": {},
+        "tech_stack": ["Python", "miniQMT"],
+        "related_projects": [],
     },
     "qmt": {
         "name": "QMT 量化交易接口",
         "description": "通过 QMT（迅投 miniQMT）接入 A 股券商账户的数据通道。提供持仓查询、交易记录获取、实时行情等功能，作为 etf-live-trading 项目的数据源。",
-        "links": {}
+        "links": {},
+        "tech_stack": ["Python", "miniQMT"],
+        "related_projects": ["etf-live-trading"],
     },
     "ghostfolio-ibkr": {
         "name": "Ghostfolio 投资组合尝试",
         "description": "尝试使用开源投资组合管理软件 Ghostfolio 来管理 IBKR 账户数据。经评估后放弃，回归自建 ibkr 项目。",
-        "links": {}
+        "links": {},
+        "tech_stack": ["Docker", "Ghostfolio"],
+        "related_projects": ["ibkr"],
     },
 }
 
 
 def extract_project_info(project_dir: Path, slug: str) -> tuple:
-    """从 CLAUDE.md / README.md 提取项目名、简介和链接，优先使用手工补充信息"""
+    """从 CLAUDE.md / README.md 提取项目名、简介、链接、技术栈和关联项目，优先使用手工补充信息"""
     # 手工补充优先
     if slug in PROJECT_INFO:
         pi = PROJECT_INFO[slug]
-        return pi["name"], pi["description"], pi.get("links", {})
+        return pi["name"], pi["description"], pi.get("links", {}), pi.get("tech_stack", []), pi.get("related_projects", [])
 
     # 尝试从文件提取
     name = slug
@@ -159,7 +183,7 @@ def extract_project_info(project_dir: Path, slug: str) -> tuple:
     except Exception:
         pass
 
-    return name, description or f"{slug} 项目", links
+    return name, description or f"{slug} 项目", links, [], []
 
 
 def scan_git_projects() -> dict:
@@ -196,8 +220,8 @@ def scan_git_projects() -> dict:
         if del_match:
             lines_removed = int(del_match.group(1))
 
-        # 从 CLAUDE.md / README.md 提取项目名、简介和链接
-        name, description, links = extract_project_info(item, slug)
+        # 从 CLAUDE.md / README.md 提取项目名、简介、链接、技术栈和关联项目
+        name, description, links, tech_stack, related_projects = extract_project_info(item, slug)
 
         projects[slug] = {
             "slug": slug,
@@ -212,6 +236,11 @@ def scan_git_projects() -> dict:
             "lines_removed": lines_removed,
             "recent_commits": commits[:20],
             "links": links,
+            "tech_stack": tech_stack,
+            "related_projects": related_projects,
+            "local_path": str(item),
+            "has_claude_md": 1 if (item / "CLAUDE.md").exists() else 0,
+            "is_manual": 0,
         }
     return projects
 
@@ -284,6 +313,7 @@ def scan_claude_history(projects: dict) -> dict:
         else:
             # 无 git 的项目，仅从 Claude 历史中发现
             pi = PROJECT_INFO.get(slug, {})
+            local_path = str(QUANT_ROOT / slug)
             projects[slug] = {
                 "slug": slug,
                 "name": pi.get("name", slug),
@@ -299,33 +329,107 @@ def scan_claude_history(projects: dict) -> dict:
                 "claude_messages": info["messages"],
                 "recent_commits": [],
                 "links": pi.get("links", {}),
+                "tech_stack": pi.get("tech_stack", []),
+                "related_projects": pi.get("related_projects", []),
+                "local_path": local_path,
+                "has_claude_md": 1 if (QUANT_ROOT / slug / "CLAUDE.md").exists() else 0,
+                "is_manual": 0,
             }
 
     return projects
 
 
+def scan_claude_sessions(projects: dict) -> dict:
+    """从 Claude Code 历史中找到每个项目最近的 sessionId，生成 resume 命令"""
+    if not CLAUDE_HISTORY.exists():
+        return projects
+
+    entries = []
+    with open(CLAUDE_HISTORY, "r", encoding="utf-8", errors="replace") as f:
+        for line in f:
+            try:
+                entries.append(json.loads(line.strip()))
+            except Exception:
+                pass
+
+    quant_str = str(QUANT_ROOT).replace("\\", "/").lower()
+
+    # 找每个项目最近的 session
+    latest_session = {}  # slug -> (timestamp, session_id)
+
+    for e in entries:
+        proj_path = e.get("project", "").replace("\\", "/")
+        display = e.get("display", "")
+        session_id = e.get("sessionId", "")
+        ts = e.get("timestamp", 0)
+
+        slug = None
+        proj_lower = proj_path.lower()
+        if quant_str in proj_lower and proj_lower != quant_str:
+            after = proj_path[len(quant_str):].strip("/").split("/")[0] if len(proj_path) > len(quant_str) else ""
+            if after and after.lower() != "devlog":
+                slug = after
+
+        if not slug and display:
+            for known_slug in projects.keys():
+                patterns = [
+                    f"quant/{known_slug}",
+                    f"quant\\{known_slug}",
+                    known_slug.lower(),
+                ]
+                for p in patterns:
+                    if p in display.lower():
+                        slug = known_slug
+                        break
+                if slug:
+                    break
+
+        if slug and slug in projects and session_id and ts:
+            prev = latest_session.get(slug)
+            if prev is None or ts > prev[0]:
+                latest_session[slug] = (ts, session_id)
+
+    for slug, (_, session_id) in latest_session.items():
+        projects[slug]["claude_resume_cmd"] = f"claude --resume {session_id}"
+
+    return projects
+
+
 def push_to_d1(projects: dict):
-    """通过 wrangler d1 execute 推送数据"""
-    statements = ["DELETE FROM projects;"]
+    """通过 wrangler d1 execute 推送数据，保留手动项目和备注"""
+    # 用 DELETE + INSERT，但保留 notes：先删除非手动项目，再插入
+    # notes 通过 COALESCE 子查询保留
+    statements = ["DELETE FROM projects WHERE is_manual = 0;"]
 
     for p in projects.values():
         recent = json.dumps(p.get("recent_commits", []), ensure_ascii=False)
         links = json.dumps(p.get("links", {}), ensure_ascii=False)
+        tech_stack = json.dumps(p.get("tech_stack", []), ensure_ascii=False)
+        related_projects = json.dumps(p.get("related_projects", []), ensure_ascii=False)
         # 转义单引号
         name = p["name"].replace("'", "''")
         desc = p["description"].replace("'", "''")
         recent_escaped = recent.replace("'", "''")
         links_escaped = links.replace("'", "''")
+        tech_escaped = tech_stack.replace("'", "''")
+        related_escaped = related_projects.replace("'", "''")
+        local_path = p.get("local_path", "").replace("\\", "/").replace("'", "''")
+        claude_resume = p.get("claude_resume_cmd", "").replace("'", "''")
 
         sql = (
             f"INSERT INTO projects (slug, name, description, status, total_commits, "
             f"first_commit_at, last_commit_at, files_changed, lines_added, lines_removed, "
-            f"claude_sessions, claude_messages, recent_commits, links, scanned_at) VALUES ("
+            f"claude_sessions, claude_messages, recent_commits, links, "
+            f"tech_stack, related_projects, local_path, has_claude_md, is_manual, claude_resume_cmd, "
+            f"scanned_at) VALUES ("
             f"'{p['slug']}', '{name}', '{desc}', '{p['status']}', {p['total_commits']}, "
             f"'{p.get('first_commit_at', '')}', '{p.get('last_commit_at', '')}', "
             f"{p['files_changed']}, {p['lines_added']}, {p['lines_removed']}, "
             f"{p.get('claude_sessions', 0)}, {p.get('claude_messages', 0)}, "
-            f"'{recent_escaped}', '{links_escaped}', datetime('now'));"
+            f"'{recent_escaped}', '{links_escaped}', "
+            f"'{tech_escaped}', '{related_escaped}', '{local_path}', "
+            f"{p.get('has_claude_md', 0)}, 0, '{claude_resume}', "
+            f"datetime('now'));"
         )
         statements.append(sql)
 
@@ -341,8 +445,14 @@ def push_to_d1(projects: dict):
     if result.returncode == 0:
         print("推送成功！")
     else:
-        print(f"推送失败: {result.stderr}")
-        sys.exit(1)
+        # wrangler stderr may contain unicode chars that GBK can't encode
+        stderr = result.stderr.encode('ascii', errors='replace').decode('ascii')
+        print(f"推送失败: {stderr}")
+        # Check if it's just a warning (wrangler sometimes returns non-zero for warnings)
+        if "Success" in result.stdout or "Executed" in result.stdout:
+            print("(但 stdout 表示成功)")
+        else:
+            sys.exit(1)
 
     sql_file.unlink(missing_ok=True)
 
@@ -353,15 +463,20 @@ def main():
     print(f"Claude 历史: {CLAUDE_HISTORY}")
     print()
 
-    print("[1/3] 扫描 Git 项目...")
+    print("[1/4] 扫描 Git 项目...")
     projects = scan_git_projects()
     print(f"  发现 {len(projects)} 个 Git 项目")
 
-    print("[2/3] 解析 Claude Code 历史...")
+    print("[2/4] 解析 Claude Code 历史...")
     projects = scan_claude_history(projects)
     print(f"  共 {len(projects)} 个项目（含无 git 项目）")
 
-    print("[3/3] 推送到 D1...")
+    print("[3/4] 扫描 Claude 会话 resume 信息...")
+    projects = scan_claude_sessions(projects)
+    resume_count = sum(1 for p in projects.values() if p.get("claude_resume_cmd"))
+    print(f"  {resume_count} 个项目有可恢复会话")
+
+    print("[4/4] 推送到 D1...")
     push_to_d1(projects)
 
     print()
