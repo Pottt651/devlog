@@ -116,7 +116,7 @@ PROJECT_INFO = {
     "devlog": {
         "name": "Devlog 个人开发博客",
         "description": "个人开发博客，自动从 Claude Code 历史和 Git 日志中提取所有 coding 项目摘要，支持日记编辑和 Markdown 导出。Cloudflare Pages + D1 架构，随时随地可访问。",
-        "links": {"live": "https://devlog-osr.pages.dev", "github": "https://github.com/Pottt651/devlog"},
+        "links": {"live": "https://pott1587.xyz", "github": "https://github.com/Pottt651/devlog"},
         "tech_stack": ["React", "TypeScript", "Vite", "Cloudflare Pages", "D1", "Python"],
         "related_projects": [],
     },

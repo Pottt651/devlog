@@ -15,7 +15,7 @@ function App() {
             <div className="brand-icon">D</div>
             <div>
               <div className="brand-title">Devlog</div>
-              <div className="brand-sub">quant · 汤</div>
+              <div className="brand-sub">pott1587.xyz</div>
             </div>
           </div>
           <nav className="sidebar-nav">
