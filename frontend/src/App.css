@@ -119,6 +119,38 @@ a:hover { color: var(--accent-hover); }
   color: white;
 }
 
+/* === Sidebar Links === */
+.sidebar-links {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.links-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0 12px 8px;
+}
+
+.nav-link-ext {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 13px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.nav-link-ext:hover {
+  background: var(--bg);
+  color: var(--accent);
+}
+
 .sidebar-footer {
   padding: 16px 20px;
   font-size: 11px;
