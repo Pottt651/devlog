@@ -113,6 +113,33 @@ PROJECT_INFO = {
         "tech_stack": ["Docker", "Ghostfolio"],
         "related_projects": ["ibkr"],
     },
+    "devlog": {
+        "name": "Devlog 个人开发博客",
+        "description": "个人开发博客，自动从 Claude Code 历史和 Git 日志中提取所有 coding 项目摘要，支持日记编辑和 Markdown 导出。Cloudflare Pages + D1 架构，随时随地可访问。",
+        "links": {"live": "https://devlog-osr.pages.dev", "github": "https://github.com/Pottt651/devlog"},
+        "tech_stack": ["React", "TypeScript", "Vite", "Cloudflare Pages", "D1", "Python"],
+        "related_projects": [],
+    },
+    "Kangaroo": {
+        "name": "袋鼠数学竞赛工具",
+        "description": "袋鼠数学竞赛相关的 Flutter 应用项目。用于数学题目展示和练习。",
+        "links": {},
+        "tech_stack": ["Flutter", "Dart"],
+        "related_projects": ["math_teacher"],
+    },
+    "math_teacher": {
+        "name": "数学教学动画演示",
+        "description": "高中数学教学辅助工具。包含模考试卷的 LaTeX 答案解析生成，用于课堂教学和学生备考指导。",
+        "links": {},
+        "tech_stack": ["LaTeX", "Python"],
+        "related_projects": ["Kangaroo", "alphamath_claude"],
+    },
+}
+
+# 非 quant 目录下的项目路径映射
+EXTRA_PROJECT_PATHS = {
+    "Kangaroo": Path(r"C:/Users/汤/Documents/Kangaroo"),
+    "math_teacher": Path(r"C:/Users/汤/Documents/math_teacher"),
 }
 
 
@@ -187,13 +214,42 @@ def extract_project_info(project_dir: Path, slug: str) -> tuple:
 
 
 def scan_git_projects() -> dict:
-    """扫描 quant/ 下所有 git 项目"""
+    """扫描 quant/ 下所有 git 项目 + 额外项目路径"""
     projects = {}
+
+    # 收集所有要扫描的目录: quant 子目录 + 额外路径
+    scan_dirs = []
     for item in sorted(QUANT_ROOT.iterdir()):
-        if not item.is_dir() or not (item / ".git").exists():
-            continue
-        slug = item.name
-        if slug == "devlog":
+        if item.is_dir():
+            scan_dirs.append((item.name, item))
+    for slug, path in EXTRA_PROJECT_PATHS.items():
+        if path.is_dir():
+            scan_dirs.append((slug, path))
+
+    for slug, item in scan_dirs:
+        if not (item / ".git").exists():
+            # 无 git 但在 PROJECT_INFO 中的项目，也加入（作为非 git 项目）
+            if slug in PROJECT_INFO:
+                name, description, links, tech_stack, related_projects = extract_project_info(item, slug)
+                projects[slug] = {
+                    "slug": slug,
+                    "name": name,
+                    "description": description,
+                    "status": "paused",
+                    "total_commits": 0,
+                    "first_commit_at": None,
+                    "last_commit_at": None,
+                    "files_changed": 0,
+                    "lines_added": 0,
+                    "lines_removed": 0,
+                    "recent_commits": [],
+                    "links": links,
+                    "tech_stack": tech_stack,
+                    "related_projects": related_projects,
+                    "local_path": str(item),
+                    "has_claude_md": 1 if (item / "CLAUDE.md").exists() else 0,
+                    "is_manual": 0,
+                }
             continue
 
         # 基本信息
@@ -277,8 +333,20 @@ def scan_claude_history(projects: dict) -> dict:
         if quant_str in proj_lower and proj_lower != quant_str:
             # 提取子目录名
             after = proj_path[len(quant_str):].strip("/").split("/")[0] if len(proj_path) > len(quant_str) else ""
-            if after and after.lower() != "devlog":
+            if after:
                 slug = after
+
+        # 匹配 Documents 下的非 quant 项目
+        if not slug:
+            docs_str = "c:/users/汤/documents/"
+            if docs_str in proj_lower:
+                after = proj_lower[len(docs_str):].split("/")[0]
+                if after in [k.lower() for k in EXTRA_PROJECT_PATHS]:
+                    # 找回原始大小写
+                    for k in EXTRA_PROJECT_PATHS:
+                        if k.lower() == after:
+                            slug = k
+                            break
 
         # 如果 CWD 是用户根目录，从 display 中查找项目路径引用
         if not slug and display:

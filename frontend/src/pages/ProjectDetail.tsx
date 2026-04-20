@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { api, type Project } from "../lib/api";
@@ -20,6 +20,7 @@ export default function ProjectDetail() {
   const [notes, setNotes] = useState("");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (slug) {
@@ -62,6 +63,11 @@ export default function ProjectDetail() {
       <div className="detail-hero">
         <h1>{project.name}</h1>
         <span className={`status-pill status-${project.status}`}>{statusLabels[project.status] || project.status}</span>
+        <button className="btn btn-sm btn-danger" style={{ marginLeft: "auto" }} onClick={async () => {
+          if (!confirm(`确认删除项目「${project.name}」？`)) return;
+          await api.deleteProject(project.slug);
+          navigate("/projects");
+        }}>删除</button>
       </div>
 
       <p className="detail-description">{project.description}</p>

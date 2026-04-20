@@ -52,6 +52,8 @@ export const api = {
     request<Project>("/projects", { method: "POST", body: JSON.stringify(body) }),
   updateProjectNotes: (slug: string, notes: string) =>
     request<void>(`/projects/${slug}`, { method: "PUT", body: JSON.stringify({ notes }) }),
+  deleteProject: (slug: string) =>
+    request<void>(`/projects/${slug}`, { method: "DELETE" }),
 
   getDiaryEntries: (tag?: string) =>
     request<DiaryEntry[]>(`/diary${tag ? `?tag=${tag}` : ""}`),

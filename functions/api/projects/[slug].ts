@@ -27,3 +27,10 @@ export const onRequestPut: PagesFunction<Env> = async ({ env, params, request })
   await env.DB.prepare("UPDATE projects SET notes = ? WHERE slug = ?").bind(body.notes, slug).run();
   return new Response(null, { status: 204 });
 };
+
+// DELETE /api/projects/:slug
+export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
+  const slug = params.slug as string;
+  await env.DB.prepare("DELETE FROM projects WHERE slug = ?").bind(slug).run();
+  return new Response(null, { status: 204 });
+};
