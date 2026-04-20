@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Nets Explorer</title>
+    <style>
+html {
+  color-scheme: light;
+}
+
+:root {
+  --bg: #f6efe4;
+  --bg-strong: #f0e2cf;
+  --panel: rgba(255, 250, 242, 0.82);
+  --panel-strong: rgba(255, 248, 238, 0.96);
+  --ink: #17313f;
+  --ink-soft: #466070;
+  --line: rgba(23, 49, 63, 0.14);
+  --accent: #e97451;
+  --accent-strong: #c95f40;
+  --teal: #2f8f9d;
+  --gold: #d8a23c;
+  --shadow: 0 24px 60px rgba(65, 45, 24, 0.12);
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --transition: 220ms ease;
+  --title-font: "Georgia", "Times New Roman", serif;
+  --body-font: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--body-font);
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(47, 143, 157, 0.16), transparent 24%),
+    linear-gradient(135deg, var(--bg) 0%, #f9f3ea 45%, var(--bg-strong) 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(23, 49, 63, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 49, 63, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, black 56%, transparent 92%);
+}
+
+.page-shell {
+  width: min(1400px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 36px 0 48px;
+}
+
+.hero,
+.top-bar,
+.stage-card,
+.info-card {
+  position: relative;
+  backdrop-filter: blur(18px);
+}
+
+.hero {
+  padding: 24px 28px 12px;
+}
+
+.eyebrow,
+.panel-label {
+  margin: 0 0 10px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-family: var(--title-font);
+  font-weight: 700;
+  line-height: 1.02;
+}
+
+h1 {
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
+  max-width: 10ch;
+}
+
+h2 {
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+}
+
+.hero-copy {
+  margin: 16px 0 0;
+  max-width: 54rem;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.top-bar {
+  margin: 18px 0 22px;
+  padding: 0 28px;
+}
+
+.shape-switch {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 248, 238, 0.76);
+  box-shadow: var(--shadow);
+}
+
+.shape-button,
+.control-button {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  transition:
+    transform var(--transition),
+    background var(--transition),
+    color var(--transition),
+    box-shadow var(--transition);
+  font: inherit;
+}
+
+.shape-button {
+  padding: 14px 22px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.shape-button:hover,
+.shape-button:focus-visible {
+  background: rgba(47, 143, 157, 0.1);
+  color: var(--ink);
+  outline: none;
+}
+
+.shape-button.is-active {
+  background: linear-gradient(135deg, var(--accent), #f28d62);
+  color: white;
+  box-shadow: 0 10px 24px rgba(201, 95, 64, 0.28);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.stage-card,
+.info-card {
+  border: 1px solid rgba(23, 49, 63, 0.1);
+  border-radius: var(--radius-xl);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.stage-card {
+  padding: 24px;
+}
+
+.stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.stage-caption {
+  max-width: 28ch;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.svg-wrap {
+  min-height: 540px;
+  padding: 10px;
+  border-radius: calc(var(--radius-xl) - 6px);
+  background:
+    radial-gradient(circle at top center, rgba(255, 255, 255, 0.8), transparent 48%),
+    linear-gradient(180deg, rgba(244, 233, 218, 0.9), rgba(248, 241, 232, 0.72));
+  border: 1px solid rgba(23, 49, 63, 0.08);
+  overflow: hidden;
+}
+
+#prism-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: grab;
+  touch-action: none;
+}
+
+#prism-svg.is-dragging {
+  cursor: grabbing;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.fold-control {
+  flex: 1 1 100%;
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(23, 49, 63, 0.08);
+}
+
+.fold-control label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.fold-control input[type="range"] {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--teal);
+}
+
+.fold-scale {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.fold-scale strong {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.control-button {
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(23, 49, 63, 0.08);
+}
+
+.control-button:hover,
+.control-button:focus-visible {
+  transform: translateY(-1px);
+  background: white;
+  outline: none;
+}
+
+.control-button--accent {
+  background: linear-gradient(135deg, var(--teal), #56a6b1);
+  color: white;
+}
+
+.control-button.is-running,
+.control-button--accent.is-running {
+  box-shadow: 0 0 0 4px rgba(47, 143, 157, 0.12);
+}
+
+.info-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.info-card {
+  padding: 22px;
+  background: var(--panel-strong);
+}
+
+.formula-display {
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.shape-summary-copy {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 1.08rem;
+  line-height: 1.62;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.formula-breakdown,
+.dimension-guide {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.formula-piece,
+.guide-chip {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(23, 49, 63, 0.1);
+  background: rgba(255, 255, 255, 0.78);
+  transition:
+    transform var(--transition),
+    border-color var(--transition),
+    background var(--transition),
+    box-shadow var(--transition);
+}
+
+.formula-piece {
+  display: grid;
+  gap: 8px;
+}
+
+.formula-piece__math {
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.formula-piece__text {
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.formula-piece.is-active {
+  transform: translateY(-1px);
+  border-color: rgba(233, 116, 81, 0.55);
+  background: rgba(255, 244, 236, 0.98);
+  box-shadow: 0 12px 22px rgba(201, 95, 64, 0.14);
+}
+
+.lesson-copy {
+  display: grid;
+  gap: 12px;
+  line-height: 1.68;
+  color: var(--ink-soft);
+}
+
+.lesson-copy strong {
+  color: var(--ink);
+}
+
+.guide-chip {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.guide-chip span {
+  display: block;
+  margin-top: 4px;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+.stage-ghost {
+  fill: rgba(23, 49, 63, 0.04);
+  stroke: rgba(23, 49, 63, 0.18);
+  stroke-dasharray: 10 9;
+  stroke-width: 2;
+}
+
+.face-shape {
+  stroke: rgba(23, 49, 63, 0.32);
+  stroke-width: 2.2;
+  filter: url(#card-shadow);
+}
+
+.face-group.is-focus .face-shape {
+  stroke: rgba(23, 49, 63, 0.58);
+  stroke-width: 3;
+}
+
+.face-label {
+  text-anchor: middle;
+  font-family: var(--body-font);
+  fill: var(--ink);
+  pointer-events: none;
+}
+
+.face-label .face-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.face-label .face-subtitle {
+  font-size: 16px;
+  fill: rgba(23, 49, 63, 0.76);
+}
+
+.face-label .face-small {
+  font-size: 15px;
+  fill: rgba(23, 49, 63, 0.78);
+}
+
+.center-note {
+  font-family: var(--body-font);
+  font-size: 18px;
+  font-weight: 700;
+  fill: rgba(23, 49, 63, 0.74);
+}
+
+@media (max-width: 1120px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-header {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .stage-caption {
+    max-width: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-shell {
+    width: min(100vw - 16px, 1400px);
+    padding: 18px 0 28px;
+  }
+
+  .hero,
+  .top-bar {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .stage-card,
+  .info-card {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .svg-wrap {
+    min-height: 420px;
+  }
+
+  .shape-switch {
+    width: 100%;
+    display: grid;
+  }
+
+  .shape-button {
+    width: 100%;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fold-control {
+    grid-column: 1 / -1;
+  }
+
+  .control-button {
+    width: 100%;
+  }
+}
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <p class="eyebrow">Geometry Classroom Demo</p>
+        <h1>3D Nets Explorer</h1>
+        <p class="hero-copy">
+          Open and close each solid from a 3D view. See how prisms, a pyramid,
+          and a cylinder unfold into flat nets that stay connected.
+        </p>
+      </section>
+
+      <section class="top-bar" aria-label="Shape selector">
+        <div class="shape-switch" role="tablist">
+          <button
+            class="shape-button is-active"
+            id="shape-rectangular"
+            type="button"
+            data-shape="rectangular"
+            role="tab"
+            aria-selected="true"
+          >
+            Rectangular Prism
+          </button>
+          <button
+            class="shape-button"
+            id="shape-triangular"
+            type="button"
+            data-shape="triangular"
+            role="tab"
+            aria-selected="false"
+          >
+            Triangular Prism
+          </button>
+          <button
+            class="shape-button"
+            id="shape-pyramid"
+            type="button"
+            data-shape="pyramid"
+            role="tab"
+            aria-selected="false"
+          >
+            Square Pyramid
+          </button>
+          <button
+            class="shape-button"
+            id="shape-cylinder"
+            type="button"
+            data-shape="cylinder"
+            role="tab"
+            aria-selected="false"
+          >
+            Cylinder
+          </button>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <section class="stage-card">
+          <div class="stage-header">
+            <div>
+              <p class="panel-label">Animated Net</p>
+              <h2 id="stage-title">Rectangular Prism</h2>
+            </div>
+            <p id="stage-caption" class="stage-caption">
+              The prism starts folded. Open one face at a time.
+            </p>
+          </div>
+
+          <div class="svg-wrap">
+            <svg
+              id="prism-svg"
+              viewBox="0 0 1000 700"
+              role="img"
+              aria-labelledby="stage-title stage-caption"
+            ></svg>
+          </div>
+
+          <div class="controls" aria-label="Animation controls">
+            <div class="fold-control">
+              <label for="fold-slider">Open the net</label>
+              <input
+                id="fold-slider"
+                type="range"
+                min="0"
+                max="100"
+                value="0"
+                aria-label="Open the net"
+              />
+              <div class="fold-scale">
+                <span>Folded</span>
+                <strong id="fold-value">0%</strong>
+                <span>Flat Net</span>
+              </div>
+            </div>
+
+            <button type="button" class="control-button" id="open-button">
+              Open
+            </button>
+            <button type="button" class="control-button" id="close-button">
+              Close
+            </button>
+            <button type="button" class="control-button" id="step-button">
+              Step
+            </button>
+            <button type="button" class="control-button" id="reset-button">
+              Reset View
+            </button>
+            <button type="button" class="control-button" id="rotate-left-button">
+              Rotate Left
+            </button>
+            <button type="button" class="control-button" id="rotate-right-button">
+              Rotate Right
+            </button>
+            <button
+              type="button"
+              class="control-button control-button--accent"
+              id="lesson-button"
+            >
+              Auto Lesson
+            </button>
+          </div>
+        </section>
+
+        <aside class="info-stack">
+          <section class="info-card">
+            <p class="panel-label">Net Parts</p>
+            <div id="shape-summary" class="formula-display"></div>
+            <div id="parts-breakdown" class="formula-breakdown"></div>
+          </section>
+
+          <section class="info-card">
+            <p class="panel-label">Lesson Notes</p>
+            <div id="lesson-copy" class="lesson-copy"></div>
+          </section>
+
+          <section class="info-card">
+            <p class="panel-label">What To Notice</p>
+            <div id="dimension-guide" class="dimension-guide"></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+    <script>
+const SVG_NS = "http://www.w3.org/2000/svg";
+const VIEW_BOX = { width: 1000, height: 700, centerX: 500, centerY: 330 };
+
+function rectPoints(width, height) {
+  return [
+    { x: -width / 2, y: -height / 2 },
+    { x: width / 2, y: -height / 2 },
+    { x: width / 2, y: height / 2 },
+    { x: -width / 2, y: height / 2 },
+  ];
+}
+
+function degToRad(degrees) {
+  return (degrees * Math.PI) / 180;
+}
+
+function rotate2D(point, angle) {
+  const cosine = Math.cos(angle);
+  const sine = Math.sin(angle);
+  return {
+    x: point.x * cosine - point.y * sine,
+    y: point.x * sine + point.y * cosine,
+  };
+}
+
+function polygonCentroid2D(points) {
+  const total = points.reduce(
+    (sum, point) => ({ x: sum.x + point.x, y: sum.y + point.y }),
+    { x: 0, y: 0 },
+  );
+
+  return {
+    x: total.x / points.length,
+    y: total.y / points.length,
+  };
+}
+
+function regularPolygonPoints(sides, radius, startAngle = -Math.PI / 2) {
+  return Array.from({ length: sides }, (_, index) => {
+    const angle = startAngle + (index * Math.PI * 2) / sides;
+    return {
+      x: radius * Math.cos(angle),
+      y: radius * Math.sin(angle),
+    };
+  });
+}
+
+function polygonWithFlatSide(sides, radius, direction) {
+  const rawPoints = regularPolygonPoints(sides, radius);
+  const edgeAngle = Math.atan2(
+    rawPoints[1].y - rawPoints[0].y,
+    rawPoints[1].x - rawPoints[0].x,
+  );
+
+  let points = rawPoints.map((point) => rotate2D(point, -edgeAngle));
+  const hingeMidpoint = {
+    x: (points[0].x + points[1].x) / 2,
+    y: (points[0].y + points[1].y) / 2,
+  };
+
+  points = points.map((point) => ({
+    x: point.x - hingeMidpoint.x,
+    y: point.y - hingeMidpoint.y,
+  }));
+
+  const centroid = polygonCentroid2D(points);
+  const shouldFlip =
+    (direction === "above" && centroid.y > 0) ||
+    (direction === "below" && centroid.y < 0);
+
+  if (shouldFlip) {
+    points = points.map((point) => ({ x: point.x, y: -point.y }));
+  }
+
+  return points;
+}
+
+function buildRectangularPrism() {
+  return {
+    key: "rectangular",
+    name: "Rectangular Prism",
+    summary:
+      "A rectangular prism opens into six rectangles. Matching faces stay the same size when they swing out into the net.",
+    parts: [
+      {
+        id: "front-back",
+        title: "Front and Back Faces",
+        text: "These two large rectangles match each other and sit at the center and far end of the net.",
+      },
+      {
+        id: "top-bottom",
+        title: "Top and Bottom Faces",
+        text: "These rectangles hinge upward and downward to open the prism.",
+      },
+      {
+        id: "left-right",
+        title: "Left and Right Faces",
+        text: "The side faces swing out from the middle to make the net wider.",
+      },
+    ],
+    guide: [
+      { short: "6 faces", text: "all of them are rectangles" },
+      { short: "3 pairs", text: "opposite faces match in size" },
+      { short: "Cross net", text: "the flat net spreads out from the center" },
+    ],
+    steps: [
+      {
+        at: 0,
+        title: "Closed Solid",
+        text: "Start with the solid prism. Drag to orbit around the 3D shape.",
+        focusFaces: ["front"],
+        focusParts: ["front-back"],
+      },
+      {
+        at: 0.24,
+        title: "Top and Right Open",
+        text: "The first faces swing on their edges and begin flattening into the net.",
+        focusFaces: ["top", "right"],
+        focusParts: ["top-bottom", "left-right"],
+      },
+      {
+        at: 0.52,
+        title: "More Faces Unfold",
+        text: "The strip gets wider as the remaining side faces open outward.",
+        focusFaces: ["top", "bottom", "left", "right"],
+        focusParts: ["top-bottom", "left-right"],
+      },
+      {
+        at: 1,
+        title: "Flat Net",
+        text: "Every face lies flat and stays connected to its neighbors.",
+        focusFaces: ["front", "back", "top", "bottom", "left", "right"],
+        focusParts: ["front-back", "top-bottom", "left-right"],
+      },
+    ],
+    rootId: "front",
+    defaultView: { yaw: degToRad(-28), pitch: degToRad(-18) },
+    camera: 980,
+    projectionScale: 1.42,
+    centerNote: "Open the faces one hinge at a time.",
+    faces: [
+      {
+        id: "front",
+        localPoints: rectPoints(240, 150),
+        label: ["Front", "main face"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#f4b183",
+        part: "front-back",
+      },
+      {
+        id: "top",
+        parent: "front",
+        localPoints: rectPoints(240, 110),
+        openOrigin: { x: 0, y: -130 },
+        hinge: [
+          { x: -120, y: -75 },
+          { x: 120, y: -75 },
+        ],
+        closedAngle: 90,
+        start: 0.08,
+        end: 0.28,
+        label: ["Top", "opens up"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#f7d07a",
+        part: "top-bottom",
+      },
+      {
+        id: "right",
+        parent: "front",
+        localPoints: rectPoints(110, 150),
+        openOrigin: { x: 175, y: 0 },
+        hinge: [
+          { x: 120, y: -75 },
+          { x: 120, y: 75 },
+        ],
+        closedAngle: 90,
+        start: 0.22,
+        end: 0.42,
+        label: ["Right", "side face"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#8ed1c2",
+        part: "left-right",
+      },
+      {
+        id: "bottom",
+        parent: "front",
+        localPoints: rectPoints(240, 110),
+        openOrigin: { x: 0, y: 130 },
+        hinge: [
+          { x: 120, y: 75 },
+          { x: -120, y: 75 },
+        ],
+        closedAngle: 90,
+        start: 0.38,
+        end: 0.58,
+        label: ["Bottom", "opens down"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#f7d07a",
+        part: "top-bottom",
+      },
+      {
+        id: "left",
+        parent: "front",
+        localPoints: rectPoints(110, 150),
+        openOrigin: { x: -175, y: 0 },
+        hinge: [
+          { x: -120, y: 75 },
+          { x: -120, y: -75 },
+        ],
+        closedAngle: 90,
+        start: 0.46,
+        end: 0.66,
+        label: ["Left", "side face"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#8ed1c2",
+        part: "left-right",
+      },
+      {
+        id: "back",
+        parent: "right",
+        localPoints: rectPoints(240, 150),
+        openOrigin: { x: 175, y: 0 },
+        hinge: [
+          { x: 55, y: -75 },
+          { x: 55, y: 75 },
+        ],
+        closedAngle: 90,
+        start: 0.72,
+        end: 0.94,
+        label: ["Back", "last face"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#f29f67",
+        part: "front-back",
+      },
+    ],
+  };
+}
+
+function buildTriangularPrism() {
+  const base = 200;
+  const sideB = 160;
+  const sideA = 120;
+  const prismLength = 180;
+  const triangleTop = [
+    { x: -base / 2, y: 0 },
+    { x: base / 2, y: 0 },
+    { x: 28, y: -96 },
+  ];
+  const triangleBottom = triangleTop.map((point) => ({ x: point.x, y: -point.y }));
+
+  return {
+    key: "triangular",
+    name: "Triangular Prism",
+    summary:
+      "This prism uses a 3-4-5 style triangle, so the three rectangles wrap neatly around the base and close without gaps.",
+    parts: [
+      {
+        id: "side-strip",
+        title: "Three Side Rectangles",
+        text: "These rectangles wrap around the triangle and make a connected strip in the net.",
+      },
+      {
+        id: "triangle-ends",
+        title: "Two Triangle Ends",
+        text: "The matching triangles close the two ends of the prism and swing out when the net opens.",
+      },
+    ],
+    guide: [
+      { short: "5 faces", text: "3 rectangles and 2 triangles" },
+      { short: "True closure", text: "the side strip matches the triangle edges" },
+      { short: "Long strip", text: "the net opens into a band with two ends" },
+    ],
+    steps: [
+      {
+        at: 0,
+        title: "Closed Solid",
+        text: "The three side rectangles wrap tightly around the triangle, so the prism closes cleanly.",
+        focusFaces: ["rect-c"],
+        focusParts: ["side-strip"],
+      },
+      {
+        at: 0.3,
+        title: "Strip Starts Opening",
+        text: "The side strip unwraps and the triangle becomes easier to see.",
+        focusFaces: ["rect-a", "rect-b", "rect-c"],
+        focusParts: ["side-strip"],
+      },
+      {
+        at: 0.72,
+        title: "Triangle Ends Swing Out",
+        text: "The two matching triangle ends open away from the middle rectangle.",
+        focusFaces: ["tri-top", "tri-bottom"],
+        focusParts: ["triangle-ends"],
+      },
+      {
+        at: 1,
+        title: "Flat Net",
+        text: "Now the whole net is flat: one rectangle strip and two congruent triangles.",
+        focusFaces: ["rect-a", "rect-b", "rect-c", "tri-top", "tri-bottom"],
+        focusParts: ["side-strip", "triangle-ends"],
+      },
+    ],
+    rootId: "rect-c",
+    defaultView: { yaw: degToRad(-34), pitch: degToRad(-18) },
+    camera: 980,
+    projectionScale: 1.52,
+    centerNote: "This one closes fully because the edge lengths really match.",
+    faces: [
+      {
+        id: "rect-c",
+        localPoints: rectPoints(base, prismLength),
+        label: ["Middle Face", "edge c"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#9ec5fe",
+        part: "side-strip",
+      },
+      {
+        id: "rect-b",
+        parent: "rect-c",
+        localPoints: rectPoints(sideB, prismLength),
+        openOrigin: { x: -base / 2 - sideB / 2, y: 0 },
+        hinge: [
+          { x: -base / 2, y: prismLength / 2 },
+          { x: -base / 2, y: -prismLength / 2 },
+        ],
+        closedAngle: 143.13,
+        start: 0.12,
+        end: 0.38,
+        label: ["Side Face", "edge b"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#8ed1c2",
+        part: "side-strip",
+      },
+      {
+        id: "rect-a",
+        parent: "rect-c",
+        localPoints: rectPoints(sideA, prismLength),
+        openOrigin: { x: base / 2 + sideA / 2, y: 0 },
+        hinge: [
+          { x: base / 2, y: -prismLength / 2 },
+          { x: base / 2, y: prismLength / 2 },
+        ],
+        closedAngle: 126.87,
+        start: 0.28,
+        end: 0.54,
+        label: ["Side Face", "edge a"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#f7c873",
+        part: "side-strip",
+      },
+      {
+        id: "tri-top",
+        parent: "rect-c",
+        localPoints: triangleTop,
+        openOrigin: { x: 0, y: -prismLength / 2 },
+        hinge: [
+          { x: -base / 2, y: -prismLength / 2 },
+          { x: base / 2, y: -prismLength / 2 },
+        ],
+        closedAngle: 90,
+        start: 0.58,
+        end: 0.8,
+        label: ["Triangle End", "top end"],
+        labelPoint: { x: 10, y: -34 },
+        color: "#f4a9a8",
+        part: "triangle-ends",
+      },
+      {
+        id: "tri-bottom",
+        parent: "rect-c",
+        localPoints: triangleBottom,
+        openOrigin: { x: 0, y: prismLength / 2 },
+        hinge: [
+          { x: base / 2, y: prismLength / 2 },
+          { x: -base / 2, y: prismLength / 2 },
+        ],
+        closedAngle: 90,
+        start: 0.66,
+        end: 0.88,
+        label: ["Triangle End", "bottom end"],
+        labelPoint: { x: 10, y: 34 },
+        color: "#f4a9a8",
+        part: "triangle-ends",
+      },
+    ],
+  };
+}
+
+function buildSquarePyramid() {
+  const base = 170;
+  const half = base / 2;
+  const slantHeight = 150;
+  const foldAngle = 124.54;
+
+  return {
+    key: "pyramid",
+    name: "Square Pyramid",
+    summary:
+      "A square pyramid has one square base and four matching triangles. The net opens like a star around the square.",
+    parts: [
+      {
+        id: "base",
+        title: "Square Base",
+        text: "The square stays in the middle of the net and anchors every triangle.",
+      },
+      {
+        id: "triangles",
+        title: "Four Side Triangles",
+        text: "Each triangle folds up to meet at the apex when the pyramid closes.",
+      },
+    ],
+    guide: [
+      { short: "5 faces", text: "1 square and 4 triangles" },
+      { short: "Star net", text: "triangles spread around the base" },
+      { short: "One apex", text: "all side faces meet at one top point" },
+    ],
+    steps: [
+      {
+        at: 0,
+        title: "Closed Solid",
+        text: "The four triangles meet at one apex above the square base.",
+        focusFaces: ["base"],
+        focusParts: ["base", "triangles"],
+      },
+      {
+        at: 0.32,
+        title: "Two Triangles Open",
+        text: "The first side faces swing out from the square base.",
+        focusFaces: ["top", "right"],
+        focusParts: ["triangles"],
+      },
+      {
+        at: 0.62,
+        title: "All Side Faces Open",
+        text: "Now the pyramid opens wider and the square base becomes the center of the net.",
+        focusFaces: ["top", "right", "bottom", "left"],
+        focusParts: ["base", "triangles"],
+      },
+      {
+        at: 1,
+        title: "Flat Net",
+        text: "The full net is one square with four triangles around it.",
+        focusFaces: ["base", "top", "right", "bottom", "left"],
+        focusParts: ["base", "triangles"],
+      },
+    ],
+    rootId: "base",
+    defaultView: { yaw: degToRad(-32), pitch: degToRad(-24) },
+    camera: 980,
+    projectionScale: 1.46,
+    centerNote: "The square stays in the middle while the triangles fan outward.",
+    faces: [
+      {
+        id: "base",
+        localPoints: rectPoints(base, base),
+        label: ["Square Base", "center face"],
+        labelPoint: { x: 0, y: 0 },
+        color: "#f7d07a",
+        part: "base",
+      },
+      {
+        id: "top",
+        parent: "base",
+        localPoints: [
+          { x: -half, y: 0 },
+          { x: half, y: 0 },
+          { x: 0, y: -slantHeight },
+        ],
+        openOrigin: { x: 0, y: -half },
+        hinge: [
+          { x: -half, y: -half },
+          { x: half, y: -half },
+        ],
+        closedAngle: foldAngle,
+        start: 0.12,
+        end: 0.34,
+        label: ["Side Triangle", "top"],
+        labelPoint: { x: 0, y: -52 },
+        color: "#f29f67",
+        part: "triangles",
+      },
+      {
+        id: "right",
+        parent: "base",
+        localPoints: [
+          { x: 0, y: -half },
+          { x: 0, y: half },
+          { x: slantHeight, y: 0 },
+        ],
+        openOrigin: { x: half, y: 0 },
+        hinge: [
+          { x: half, y: -half },
+          { x: half, y: half },
+        ],
+        closedAngle: foldAngle,
+        start: 0.28,
+        end: 0.52,
+        label: ["Side Triangle", "right"],
+        labelPoint: { x: 54, y: 0 },
+        color: "#8ed1c2",
+        part: "triangles",
+      },
+      {
+        id: "bottom",
+        parent: "base",
+        localPoints: [
+          { x: -half, y: 0 },
+          { x: half, y: 0 },
+          { x: 0, y: slantHeight },
+        ],
+        openOrigin: { x: 0, y: half },
+        hinge: [
+          { x: half, y: half },
+          { x: -half, y: half },
+        ],
+        closedAngle: foldAngle,
+        start: 0.44,
+        end: 0.68,
+        label: ["Side Triangle", "bottom"],
+        labelPoint: { x: 0, y: 54 },
+        color: "#f4b183",
+        part: "triangles",
+      },
+      {
+        id: "left",
+        parent: "base",
+        localPoints: [
+          { x: 0, y: -half },
+          { x: 0, y: half },
+          { x: -slantHeight, y: 0 },
+        ],
+        openOrigin: { x: -half, y: 0 },
+        hinge: [
+          { x: -half, y: half },
+          { x: -half, y: -half },
+        ],
+        closedAngle: foldAngle,
+        start: 0.6,
+        end: 0.82,
+        label: ["Side Triangle", "left"],
+        labelPoint: { x: -54, y: 0 },
+        color: "#9ec5fe",
+        part: "triangles",
+      },
+    ],
+  };
+}
+
+function buildCylinder() {
+  const sides = 15;
+  const radius = 78;
+  const height = 190;
+  const panelWidth = 2 * radius * Math.sin(Math.PI / sides);
+  const rootIndex = Math.floor(sides / 2);
+  const panelIds = Array.from({ length: sides }, (_, index) => `panel-${index}`);
+  const faces = [
+    {
+      id: `panel-${rootIndex}`,
+      localPoints: rectPoints(panelWidth, height),
+      label: ["Curved Side", "wrapped strip"],
+      labelPoint: { x: 0, y: 0 },
+      color: "#8ed1c2",
+      part: "side-strip",
+    },
+  ];
+
+  let parentRight = `panel-${rootIndex}`;
+  for (let index = rootIndex + 1; index < sides; index += 1) {
+    faces.push({
+      id: `panel-${index}`,
+      parent: parentRight,
+      localPoints: rectPoints(panelWidth, height),
+      openOrigin: { x: panelWidth, y: 0 },
+      hinge: [
+        { x: panelWidth / 2, y: -height / 2 },
+        { x: panelWidth / 2, y: height / 2 },
+      ],
+      closedAngle: 360 / sides,
+      start: 0.08 + (index - rootIndex - 1) * 0.05,
+      end: 0.34 + (index - rootIndex - 1) * 0.05,
+      color: "#8ed1c2",
+      part: "side-strip",
+    });
+    parentRight = `panel-${index}`;
+  }
+
+  let parentLeft = `panel-${rootIndex}`;
+  for (let index = rootIndex - 1; index >= 0; index -= 1) {
+    faces.push({
+      id: `panel-${index}`,
+      parent: parentLeft,
+      localPoints: rectPoints(panelWidth, height),
+      openOrigin: { x: -panelWidth, y: 0 },
+      hinge: [
+        { x: -panelWidth / 2, y: height / 2 },
+        { x: -panelWidth / 2, y: -height / 2 },
+      ],
+      closedAngle: 360 / sides,
+      start: 0.08 + (rootIndex - index - 1) * 0.05,
+      end: 0.34 + (rootIndex - index - 1) * 0.05,
+      color: "#79c6b6",
+      part: "side-strip",
+    });
+    parentLeft = `panel-${index}`;
+  }
+
+  faces.push(
+    {
+      id: "cap-top",
+      parent: `panel-${rootIndex}`,
+      localPoints: polygonWithFlatSide(sides, radius, "above"),
+      openOrigin: { x: 0, y: -height / 2 },
+      hinge: [
+        { x: -panelWidth / 2, y: -height / 2 },
+        { x: panelWidth / 2, y: -height / 2 },
+      ],
+      closedAngle: 90,
+      start: 0.58,
+      end: 0.78,
+      label: ["Top Circle", "top base"],
+      labelPoint: { x: 0, y: -36 },
+      color: "#9ec5fe",
+      part: "circle-ends",
+    },
+    {
+      id: "cap-bottom",
+      parent: `panel-${rootIndex}`,
+      localPoints: polygonWithFlatSide(sides, radius, "below"),
+      openOrigin: { x: 0, y: height / 2 },
+      hinge: [
+        { x: panelWidth / 2, y: height / 2 },
+        { x: -panelWidth / 2, y: height / 2 },
+      ],
+      closedAngle: 90,
+      start: 0.66,
+      end: 0.86,
+      label: ["Bottom Circle", "bottom base"],
+      labelPoint: { x: 0, y: 36 },
+      color: "#f7d07a",
+      part: "circle-ends",
+    },
+  );
+
+  return {
+    key: "cylinder",
+    name: "Cylinder",
+    summary:
+      "A cylinder opens into one long side strip with a circle for the top and another circle for the bottom.",
+    parts: [
+      {
+        id: "side-strip",
+        title: "Long Side Strip",
+        text: "This strip wraps around to make the curved side of the cylinder.",
+      },
+      {
+        id: "circle-ends",
+        title: "Two Circle Ends",
+        text: "One circle closes the top and the other closes the bottom.",
+      },
+    ],
+    guide: [
+      { short: "3 parts", text: "1 side strip and 2 circles" },
+      { short: "Rolls closed", text: "the side strip wraps into a tube" },
+      { short: "Round ends", text: "the two circles close the tube" },
+    ],
+    steps: [
+      {
+        at: 0,
+        title: "Closed Solid",
+        text: "The side strip wraps around into a tube and the circles close the top and bottom.",
+        focusFaces: [`panel-${rootIndex}`, "cap-top", "cap-bottom"],
+        focusParts: ["side-strip", "circle-ends"],
+      },
+      {
+        at: 0.34,
+        title: "Side Strip Unwraps",
+        text: "The curved side starts rolling open into a long strip.",
+        focusFaces: panelIds,
+        focusParts: ["side-strip"],
+      },
+      {
+        at: 0.74,
+        title: "Circle Ends Swing Out",
+        text: "The top and bottom circles hinge away from the side strip.",
+        focusFaces: ["cap-top", "cap-bottom"],
+        focusParts: ["circle-ends"],
+      },
+      {
+        at: 1,
+        title: "Flat Net",
+        text: "The net shows a long strip with one circle above and one circle below.",
+        focusFaces: [...panelIds, "cap-top", "cap-bottom"],
+        focusParts: ["side-strip", "circle-ends"],
+      },
+    ],
+    rootId: `panel-${rootIndex}`,
+    defaultView: { yaw: degToRad(-42), pitch: degToRad(-16) },
+    camera: 980,
+    projectionScale: 1.48,
+    centerNote: "The side unwraps like a rolled sheet.",
+    faces,
+  };
+}
+
+const SHAPES = {
+  rectangular: buildRectangularPrism(),
+  triangular: buildTriangularPrism(),
+  pyramid: buildSquarePyramid(),
+  cylinder: buildCylinder(),
+};
+
+const state = {
+  shapeKey: "rectangular",
+  openAmount: 0,
+  viewYaw: SHAPES.rectangular.defaultView.yaw,
+  viewPitch: SHAPES.rectangular.defaultView.pitch,
+  animationFrame: null,
+  lessonTimer: null,
+  isLessonMode: false,
+  dragPointerId: null,
+  dragStartX: 0,
+  dragStartY: 0,
+  dragYaw: 0,
+  dragPitch: 0,
+};
+
+const elements = {
+  shapeButtons: [...document.querySelectorAll("[data-shape]")],
+  stageTitle: document.querySelector("#stage-title"),
+  stageCaption: document.querySelector("#stage-caption"),
+  svg: document.querySelector("#prism-svg"),
+  shapeSummary: document.querySelector("#shape-summary"),
+  partsBreakdown: document.querySelector("#parts-breakdown"),
+  lessonCopy: document.querySelector("#lesson-copy"),
+  dimensionGuide: document.querySelector("#dimension-guide"),
+  foldSlider: document.querySelector("#fold-slider"),
+  foldValue: document.querySelector("#fold-value"),
+  openButton: document.querySelector("#open-button"),
+  closeButton: document.querySelector("#close-button"),
+  stepButton: document.querySelector("#step-button"),
+  resetButton: document.querySelector("#reset-button"),
+  rotateLeftButton: document.querySelector("#rotate-left-button"),
+  rotateRightButton: document.querySelector("#rotate-right-button"),
+  lessonButton: document.querySelector("#lesson-button"),
+};
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function ease(value) {
+  return value * value * (3 - 2 * value);
+}
+
+function lerp(start, end, t) {
+  return start + (end - start) * t;
+}
+
+function vec(x, y, z) {
+  return { x, y, z };
+}
+
+function add(a, b) {
+  return vec(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+function sub(a, b) {
+  return vec(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+function scale(vector, amount) {
+  return vec(vector.x * amount, vector.y * amount, vector.z * amount);
+}
+
+function dot(a, b) {
+  return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+function cross(a, b) {
+  return vec(
+    a.y * b.z - a.z * b.y,
+    a.z * b.x - a.x * b.z,
+    a.x * b.y - a.y * b.x,
+  );
+}
+
+function length(vector) {
+  return Math.hypot(vector.x, vector.y, vector.z);
+}
+
+function normalize(vector) {
+  const value = length(vector) || 1;
+  return vec(vector.x / value, vector.y / value, vector.z / value);
+}
+
+function rotateAroundAxis(point, axisStart, axisEnd, angle) {
+  const axis = normalize(sub(axisEnd, axisStart));
+  const translated = sub(point, axisStart);
+  const cosine = Math.cos(angle);
+  const sine = Math.sin(angle);
+  const first = scale(translated, cosine);
+  const second = scale(cross(axis, translated), sine);
+  const third = scale(axis, dot(axis, translated) * (1 - cosine));
+  return add(axisStart, add(add(first, second), third));
+}
+
+function rotateY(point, angle) {
+  const cosine = Math.cos(angle);
+  const sine = Math.sin(angle);
+  return vec(
+    point.x * cosine + point.z * sine,
+    point.y,
+    -point.x * sine + point.z * cosine,
+  );
+}
+
+function rotateX(point, angle) {
+  const cosine = Math.cos(angle);
+  const sine = Math.sin(angle);
+  return vec(
+    point.x,
+    point.y * cosine - point.z * sine,
+    point.y * sine + point.z * cosine,
+  );
+}
+
+function makeBasis(origin, u, v) {
+  return {
+    origin,
+    u: normalize(u),
+    v: normalize(v),
+    w: normalize(cross(u, v)),
+  };
+}
+
+function localToWorld(basis, point) {
+  return add(
+    basis.origin,
+    add(add(scale(basis.u, point.x), scale(basis.v, point.y)), scale(basis.w, point.z || 0)),
+  );
+}
+
+function getShape() {
+  return SHAPES[state.shapeKey];
+}
+
+function createSvgNode(tag, attrs = {}) {
+  const node = document.createElementNS(SVG_NS, tag);
+  Object.entries(attrs).forEach(([key, value]) => {
+    node.setAttribute(key, value);
+  });
+  return node;
+}
+
+function rangeProgress(amount, start, end) {
+  if (start === end) {
+    return amount >= end ? 1 : 0;
+  }
+
+  return ease(clamp((amount - start) / (end - start), 0, 1));
+}
+
+function getStageStep(shape) {
+  let step = shape.steps[0];
+  shape.steps.forEach((candidate) => {
+    if (state.openAmount >= candidate.at - 0.0001) {
+      step = candidate;
+    }
+  });
+  return step;
+}
+
+function computeFaces(shape, amount) {
+  const facesById = Object.fromEntries(shape.faces.map((face) => [face.id, face]));
+  const results = [];
+
+  function visit(faceId, basis) {
+    const face = facesById[faceId];
+    const center2D = face.labelPoint || polygonCentroid2D(face.localPoints);
+    const points3D = face.localPoints.map((point) =>
+      localToWorld(basis, { x: point.x, y: point.y, z: 0 }),
+    );
+
+    results.push({
+      ...face,
+      basis,
+      points3D,
+      labelWorld: localToWorld(basis, { x: center2D.x, y: center2D.y, z: 0 }),
+      progress: face.parent ? rangeProgress(amount, face.start, face.end) : 1,
+    });
+
+    shape.faces
+      .filter((child) => child.parent === faceId)
+      .forEach((child) => {
+        const progress = rangeProgress(amount, child.start, child.end);
+        const angle = degToRad(child.closedAngle * (1 - progress));
+        const axisStart = vec(child.hinge[0].x, child.hinge[0].y, 0);
+        const axisEnd = vec(child.hinge[1].x, child.hinge[1].y, 0);
+
+        const rotateParentLocal = (point) =>
+          rotateAroundAxis(
+            vec(point.x, point.y, 0),
+            axisStart,
+            axisEnd,
+            angle,
+          );
+
+        const originLocal = rotateParentLocal(child.openOrigin);
+        const uxLocal = rotateParentLocal({
+          x: child.openOrigin.x + 1,
+          y: child.openOrigin.y,
+        });
+        const uyLocal = rotateParentLocal({
+          x: child.openOrigin.x,
+          y: child.openOrigin.y + 1,
+        });
+
+        const originWorld = localToWorld(basis, originLocal);
+        const childBasis = makeBasis(
+          originWorld,
+          sub(localToWorld(basis, uxLocal), originWorld),
+          sub(localToWorld(basis, uyLocal), originWorld),
+        );
+
+        visit(child.id, childBasis);
+      });
+  }
+
+  visit(shape.rootId, makeBasis(vec(0, 0, 0), vec(1, 0, 0), vec(0, 1, 0)));
+  return results;
+}
+
+function toViewPoint(point) {
+  return rotateX(rotateY(point, state.viewYaw), state.viewPitch);
+}
+
+function projectViewPoint(rotated, shape) {
+  const camera = shape.camera;
+  const perspective = camera / (camera - rotated.z);
+
+  return {
+    x: VIEW_BOX.centerX + rotated.x * perspective * shape.projectionScale,
+    y: VIEW_BOX.centerY + rotated.y * perspective * shape.projectionScale,
+    z: rotated.z,
+  };
+}
+
+function faceFill(hex, light) {
+  const clean = hex.replace("#", "");
+  const channels = clean.match(/.{1,2}/g).map((value) => parseInt(value, 16));
+  const amount = clamp(light, 0.55, 1.16);
+  const mapped = channels.map((channel) =>
+    Math.round(clamp(channel * amount, 0, 255))
+      .toString(16)
+      .padStart(2, "0"),
+  );
+  return `#${mapped.join("")}`;
+}
+
+function drawFacePolygon(group, face, projectedPoints, fill, isGhost, isFocus) {
+  const polygon = createSvgNode("polygon", {
+    class: isGhost ? "stage-ghost" : "face-shape",
+    points: projectedPoints.map((point) => `${point.x},${point.y}`).join(" "),
+    fill: isGhost ? "rgba(23, 49, 63, 0.03)" : fill,
+    opacity: isGhost ? "1" : String(lerp(0.72, 1, face.progress)),
+  });
+
+  if (!isGhost && isFocus) {
+    polygon.setAttribute("stroke-width", "3.3");
+  }
+
+  group.append(polygon);
+}
+
+function drawFaceLabel(group, face, labelPoint, normalZ) {
+  if (!face.label) {
+    return;
+  }
+
+  const label = createSvgNode("text", {
+    class: "face-label",
+    x: labelPoint.x,
+    y: labelPoint.y - 5,
+    opacity: String(clamp(0.32 + face.progress * 0.68 - Math.max(0, normalZ) * 0.16, 0.2, 1)),
+  });
+
+  const firstLine = createSvgNode("tspan", {
+    class: "face-title",
+    x: labelPoint.x,
+    dy: 0,
+  });
+  firstLine.textContent = face.label[0];
+  label.append(firstLine);
+
+  if (face.label[1]) {
+    const secondLine = createSvgNode("tspan", {
+      class: face.label[1].length > 15 ? "face-small" : "face-subtitle",
+      x: labelPoint.x,
+      dy: 28,
+    });
+    secondLine.textContent = face.label[1];
+    label.append(secondLine);
+  }
+
+  group.append(label);
+}
+
+function drawCenterNote(group, shape) {
+  const note = createSvgNode("text", {
+    x: VIEW_BOX.centerX,
+    y: 625,
+    class: "center-note",
+    "text-anchor": "middle",
+  });
+  note.textContent = shape.centerNote;
+  group.append(note);
+}
+
+function renderStage(shape, step) {
+  elements.stageTitle.textContent = shape.name;
+  elements.stageCaption.textContent = `${step.title}. ${step.text}`;
+  elements.svg.innerHTML = "";
+
+  const defs = createSvgNode("defs");
+  const filter = createSvgNode("filter", {
+    id: "card-shadow",
+    x: "-30%",
+    y: "-30%",
+    width: "160%",
+    height: "180%",
+  });
+  filter.append(
+    createSvgNode("feDropShadow", {
+      dx: "0",
+      dy: "16",
+      stdDeviation: "16",
+      "flood-color": "rgba(23,49,63,0.20)",
+      "flood-opacity": "0.26",
+    }),
+  );
+  defs.append(filter);
+  elements.svg.append(defs);
+
+  const ghostGroup = createSvgNode("g");
+  const liveGroup = createSvgNode("g");
+  elements.svg.append(ghostGroup, liveGroup);
+
+  computeFaces(shape, 1)
+    .map((face) => {
+      const viewPoints = face.points3D.map((point) => toViewPoint(point));
+      const projected = viewPoints.map((point) => projectViewPoint(point, shape));
+      const avgZ = viewPoints.reduce((sum, point) => sum + point.z, 0) / viewPoints.length;
+      return { face, projected, avgZ };
+    })
+    .sort((left, right) => left.avgZ - right.avgZ)
+    .forEach(({ face, projected }) => {
+      drawFacePolygon(ghostGroup, face, projected, face.color, true, false);
+    });
+
+  computeFaces(shape, state.openAmount)
+    .map((face) => {
+      const viewPoints = face.points3D.map((point) => toViewPoint(point));
+      const projected = viewPoints.map((point) => projectViewPoint(point, shape));
+      const normal = normalize(cross(sub(viewPoints[1], viewPoints[0]), sub(viewPoints[2], viewPoints[0])));
+      const avgZ = viewPoints.reduce((sum, point) => sum + point.z, 0) / viewPoints.length;
+      const light = 0.8 + Math.max(0, dot(normal, normalize(vec(-0.45, -0.65, 1)))) * 0.28;
+      const labelPoint = projectViewPoint(toViewPoint(face.labelWorld), shape);
+      return {
+        face,
+        projected,
+        avgZ,
+        fill: faceFill(face.color, light),
+        labelPoint,
+        normalZ: normal.z,
+      };
+    })
+    .sort((left, right) => left.avgZ - right.avgZ)
+    .forEach(({ face, projected, fill, labelPoint, normalZ }) => {
+      const wrapper = createSvgNode("g", {
+        class: `face-group${step.focusFaces.includes(face.id) ? " is-focus" : ""}`,
+      });
+      drawFacePolygon(wrapper, face, projected, fill, false, step.focusFaces.includes(face.id));
+      drawFaceLabel(wrapper, face, labelPoint, normalZ);
+      liveGroup.append(wrapper);
+    });
+
+  drawCenterNote(elements.svg, shape);
+}
+
+function renderPartsPanel(shape, activeParts) {
+  elements.shapeSummary.innerHTML = `<p class="shape-summary-copy">${shape.summary}</p>`;
+  elements.partsBreakdown.innerHTML = "";
+
+  shape.parts.forEach((part) => {
+    const card = document.createElement("article");
+    card.className = "formula-piece";
+    if (activeParts.includes(part.id)) {
+      card.classList.add("is-active");
+    }
+
+    const title = document.createElement("div");
+    title.className = "formula-piece__math";
+    title.textContent = part.title;
+
+    const text = document.createElement("div");
+    text.className = "formula-piece__text";
+    text.textContent = part.text;
+
+    card.append(title, text);
+    elements.partsBreakdown.append(card);
+  });
+}
+
+function renderLessonPanel(shape, step) {
+  elements.lessonCopy.innerHTML = `
+    <strong>${step.title}</strong>
+    <div>${step.text}</div>
+    <div>Use the slider for smooth folding, or drag the model to inspect the hinges in 3D.</div>
+  `;
+
+  elements.dimensionGuide.innerHTML = "";
+  shape.guide.forEach((item) => {
+    const chip = document.createElement("div");
+    chip.className = "guide-chip";
+    chip.innerHTML = `${item.short}<span>${item.text}</span>`;
+    elements.dimensionGuide.append(chip);
+  });
+}
+
+function updateControls() {
+  elements.shapeButtons.forEach((button) => {
+    const isActive = button.dataset.shape === state.shapeKey;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+
+  const percentage = Math.round(state.openAmount * 100);
+  elements.foldSlider.value = String(percentage);
+  elements.foldValue.textContent = `${percentage}%`;
+  elements.lessonButton.classList.toggle("is-running", state.isLessonMode);
+}
+
+function render() {
+  const shape = getShape();
+  const step = getStageStep(shape);
+  renderStage(shape, step);
+  renderPartsPanel(shape, step.focusParts);
+  renderLessonPanel(shape, step);
+  updateControls();
+}
+
+function stopMotion() {
+  state.isLessonMode = false;
+  if (state.lessonTimer) {
+    clearTimeout(state.lessonTimer);
+    state.lessonTimer = null;
+  }
+  if (state.animationFrame) {
+    cancelAnimationFrame(state.animationFrame);
+    state.animationFrame = null;
+  }
+}
+
+function animateOpenTo(target, duration = 900, onComplete) {
+  stopMotion();
+  const start = state.openAmount;
+  const end = clamp(target, 0, 1);
+  const startedAt = performance.now();
+
+  function frame(now) {
+    const progress = clamp((now - startedAt) / duration, 0, 1);
+    state.openAmount = lerp(start, end, ease(progress));
+    render();
+
+    if (progress < 1) {
+      state.animationFrame = requestAnimationFrame(frame);
+      return;
+    }
+
+    state.openAmount = end;
+    state.animationFrame = null;
+    render();
+    if (onComplete) {
+      onComplete();
+    }
+  }
+
+  state.animationFrame = requestAnimationFrame(frame);
+}
+
+function runLesson() {
+  stopMotion();
+  state.isLessonMode = true;
+  state.openAmount = 0;
+  render();
+
+  const targets = Array.from(
+    new Set(getShape().steps.map((step) => step.at).filter((value) => value > 0)),
+  );
+  let index = 0;
+
+  const advance = () => {
+    if (!state.isLessonMode) {
+      return;
+    }
+
+    if (index >= targets.length) {
+      state.isLessonMode = false;
+      render();
+      return;
+    }
+
+    const target = targets[index];
+    index += 1;
+    const start = state.openAmount;
+    const distance = Math.max(0.12, Math.abs(target - start));
+    const duration = 580 + distance * 620;
+    const startedAt = performance.now();
+
+    function frame(now) {
+      const progress = clamp((now - startedAt) / duration, 0, 1);
+      state.openAmount = lerp(start, target, ease(progress));
+      render();
+
+      if (progress < 1 && state.isLessonMode) {
+        state.animationFrame = requestAnimationFrame(frame);
+        return;
+      }
+
+      state.openAmount = target;
+      state.animationFrame = null;
+      render();
+
+      if (!state.isLessonMode) {
+        return;
+      }
+
+      state.lessonTimer = setTimeout(advance, 900);
+    }
+
+    state.animationFrame = requestAnimationFrame(frame);
+  };
+
+  state.lessonTimer = setTimeout(advance, 500);
+}
+
+function resetView() {
+  stopMotion();
+  const shape = getShape();
+  state.viewYaw = shape.defaultView.yaw;
+  state.viewPitch = shape.defaultView.pitch;
+  render();
+}
+
+function nextStepTarget() {
+  const steps = getShape().steps.map((step) => step.at);
+  return steps.find((value) => value > state.openAmount + 0.04) ?? 1;
+}
+
+function switchShape(shapeKey) {
+  if (shapeKey === state.shapeKey) {
+    return;
+  }
+
+  stopMotion();
+  state.shapeKey = shapeKey;
+  state.openAmount = 0;
+  state.viewYaw = SHAPES[shapeKey].defaultView.yaw;
+  state.viewPitch = SHAPES[shapeKey].defaultView.pitch;
+  render();
+}
+
+elements.shapeButtons.forEach((button) => {
+  button.addEventListener("click", () => switchShape(button.dataset.shape));
+});
+
+elements.foldSlider.addEventListener("input", (event) => {
+  stopMotion();
+  state.openAmount = Number(event.target.value) / 100;
+  render();
+});
+
+elements.openButton.addEventListener("click", () => {
+  animateOpenTo(1, 1100);
+});
+
+elements.closeButton.addEventListener("click", () => {
+  animateOpenTo(0, 900);
+});
+
+elements.stepButton.addEventListener("click", () => {
+  animateOpenTo(nextStepTarget(), 760);
+});
+
+elements.resetButton.addEventListener("click", () => {
+  resetView();
+});
+
+elements.rotateLeftButton.addEventListener("click", () => {
+  stopMotion();
+  state.viewYaw -= degToRad(18);
+  render();
+});
+
+elements.rotateRightButton.addEventListener("click", () => {
+  stopMotion();
+  state.viewYaw += degToRad(18);
+  render();
+});
+
+elements.lessonButton.addEventListener("click", () => {
+  runLesson();
+  render();
+});
+
+elements.svg.addEventListener("pointerdown", (event) => {
+  state.dragPointerId = event.pointerId;
+  state.dragStartX = event.clientX;
+  state.dragStartY = event.clientY;
+  state.dragYaw = state.viewYaw;
+  state.dragPitch = state.viewPitch;
+  elements.svg.classList.add("is-dragging");
+  elements.svg.setPointerCapture(event.pointerId);
+});
+
+elements.svg.addEventListener("pointermove", (event) => {
+  if (state.dragPointerId !== event.pointerId) {
+    return;
+  }
+
+  stopMotion();
+  const deltaX = event.clientX - state.dragStartX;
+  const deltaY = event.clientY - state.dragStartY;
+  state.viewYaw = state.dragYaw + deltaX * 0.008;
+  state.viewPitch = clamp(state.dragPitch + deltaY * 0.006, degToRad(-65), degToRad(30));
+  render();
+});
+
+function endDrag(event) {
+  if (state.dragPointerId !== event.pointerId) {
+    return;
+  }
+
+  state.dragPointerId = null;
+  elements.svg.classList.remove("is-dragging");
+}
+
+elements.svg.addEventListener("pointerup", endDrag);
+
+elements.svg.addEventListener("pointercancel", endDrag);
+
+elements.svg.addEventListener("pointerleave", (event) => {
+  if (state.dragPointerId === event.pointerId && !elements.svg.hasPointerCapture(event.pointerId)) {
+    endDrag(event);
+  }
+});
+
+render();
+    </script>
+  </body>
+</html>
