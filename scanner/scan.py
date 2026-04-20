@@ -88,7 +88,7 @@ PROJECT_INFO = {
     "cashpilot": {
         "name": "个人全资产管理",
         "description": "个人可支配资金的全方位管理工具。涵盖投资账户、月度收入、日常开销等所有资金流动。支持数据导入和手动输入，FastAPI + React 全栈架构。项目刚启动。",
-        "links": {},
+        "links": {"live": "https://cashpilot.pott1587.xyz"},
         "tech_stack": ["Python", "FastAPI", "React", "TypeScript", "Vite", "Ant Design"],
         "related_projects": [],
     },
