@@ -2,7 +2,7 @@ interface Env { DB: D1Database; }
 
 // GET /api/projects/:slug
 export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
-  const slug = params.slug as string;
+  const slug = decodeURIComponent(params.slug as string);
   const project = await env.DB.prepare(
     "SELECT * FROM projects WHERE slug = ?"
   ).bind(slug).first();
@@ -22,7 +22,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
 
 // PUT /api/projects/:slug — 更新备注
 export const onRequestPut: PagesFunction<Env> = async ({ env, params, request }) => {
-  const slug = params.slug as string;
+  const slug = decodeURIComponent(params.slug as string);
   const body = await request.json() as any;
   await env.DB.prepare("UPDATE projects SET notes = ? WHERE slug = ?").bind(body.notes, slug).run();
   return new Response(null, { status: 204 });
@@ -30,7 +30,7 @@ export const onRequestPut: PagesFunction<Env> = async ({ env, params, request })
 
 // DELETE /api/projects/:slug
 export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
-  const slug = params.slug as string;
+  const slug = decodeURIComponent(params.slug as string);
   await env.DB.prepare("DELETE FROM projects WHERE slug = ?").bind(slug).run();
   return new Response(null, { status: 204 });
 };
