@@ -32,7 +32,7 @@ PROJECT_INFO = {
     "etf-live-trading": {
         "name": "ETF 实盘交易系统",
         "description": "ETF 动量轮动策略的实盘看板 + 信号计算系统。通过 QMT 接入 A 股账户数据，展示持仓、收益、调仓信号。每周五自动计算轮动信号，部署在 Cloudflare Pages 上可随时查看。",
-        "links": {"live": "https://etf-live-trading.pages.dev", "github": "https://github.com/Pottt651/etf-live-trading"},
+        "links": {"live": "https://etf.pott1587.xyz", "github": "https://github.com/Pottt651/etf-live-trading"},
         "tech_stack": ["Python", "Pandas", "AkShare", "Cloudflare Pages", "Supabase"],
         "related_projects": ["fund_huice_codex", "qmt"],
     },
@@ -60,7 +60,7 @@ PROJECT_INFO = {
     "alphamath_claude": {
         "name": "AlphaMath 数学教学分析",
         "description": "面向上海高中数学教学的数据分析工具。对近三年上海高考、春考、一模二模试卷进行知识点标注、题型分类和趋势分析，用于指导学生备考。Claude Code 深度协作完成。",
-        "links": {"live": "https://alphamath-teacher-os.pages.dev", "github": "https://github.com/Pottt651/alphamath-teacher-os"},
+        "links": {"live": "https://alphamath.pott1587.xyz", "github": "https://github.com/Pottt651/alphamath-teacher-os"},
         "tech_stack": ["React", "TypeScript", "Vite", "Cloudflare Pages"],
         "related_projects": ["AlphaMath", "erdos"],
     },
