@@ -40,6 +40,9 @@
     --red-bg: rgba(191, 58, 43, 0.12);
     --gold-bg: rgba(169, 123, 16, 0.12);
   }
+  .tech-tag { background: rgba(67, 97, 238, 0.12); color: #7B9CFF; }
+  .link-chip.link-github { background: rgba(255,255,255,0.08); color: #ccc; }
+  .link-chip.link-github:hover { background: rgba(255,255,255,0.14); color: #eee; }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -266,8 +269,8 @@ a:hover { color: var(--accent-light); }
 }
 .link-chip.link-live { background: var(--green-bg); color: var(--green); }
 .link-chip.link-live:hover { background: rgba(45, 122, 78, 0.14); color: var(--green); }
-.link-chip.link-github { background: var(--accent-bg); color: var(--accent); }
-.link-chip.link-github:hover { background: rgba(201, 100, 66, 0.12); color: var(--accent); }
+.link-chip.link-github { background: rgba(36, 41, 46, 0.08); color: #24292e; }
+.link-chip.link-github:hover { background: rgba(36, 41, 46, 0.14); color: #24292e; }
 
 .detail-links { display: flex; gap: 10px; margin-bottom: 24px; }
 
@@ -392,7 +395,7 @@ a:hover { color: var(--accent-light); }
 
 /* === Tech Tags === */
 .tech-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
-.tech-tag { padding: 2px 10px; background: var(--accent-bg); color: var(--accent); border-radius: 20px; font-size: 11px; font-weight: 600; }
+.tech-tag { padding: 2px 10px; background: #f0f4ff; color: #4361ee; border-radius: 20px; font-size: 11px; font-weight: 600; }
 
 /* === Claude Section === */
 .claude-section { background: var(--card); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); margin-bottom: 24px; }
