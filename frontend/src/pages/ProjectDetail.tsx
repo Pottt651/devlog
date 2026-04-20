@@ -24,7 +24,7 @@ export default function ProjectDetail() {
 
   useEffect(() => {
     if (slug) {
-      api.getProject(slug).then((p) => {
+      api.getProject(decodeURIComponent(slug)).then((p) => {
         setProject(p);
         setNotes(p.notes || "");
       }).finally(() => setLoading(false));
