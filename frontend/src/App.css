@@ -129,6 +129,7 @@ a:hover { color: var(--accent-light); }
 }
 
 .nav-link-ext:hover { background: var(--accent-bg); color: var(--accent); }
+.nav-link-ext.active { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
 
 .sidebar-footer {
   padding: 16px 20px;
