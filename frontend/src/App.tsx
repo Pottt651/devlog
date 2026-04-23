@@ -17,8 +17,8 @@ function App() {
           <div className="sidebar-brand">
             <div className="brand-icon">D</div>
             <div>
-              <div className="brand-title">Devlog</div>
-              <div className="brand-sub">pott1587.xyz</div>
+              <div className="brand-title">Pott1587</div>
+              <div className="brand-sub">个人开发博客</div>
             </div>
           </div>
           <nav className="sidebar-nav">

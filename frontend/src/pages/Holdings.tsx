@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const DASHBOARD_ORIGIN = "https://finance-dashboard.richermoon8050.workers.dev";
+const DASHBOARD_ORIGIN = "https://cash.pott1587.xyz";
 
 type Tab = { key: string; label: string; path: string };
 
