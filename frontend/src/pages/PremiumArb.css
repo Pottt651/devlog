@@ -1,0 +1,252 @@
+/* === Premium Arb 页面专用样式 === */
+
+.premium-arb { max-width: 1000px; }
+
+.premium-arb .sub-header {
+  font-size: 12px; color: var(--text3); margin-top: 4px;
+  font-family: var(--mono);
+}
+
+.loading-state, .error-state {
+  padding: 40px; text-align: center; color: var(--text2);
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* === HERO 3 卡片 === */
+.hero-grid {
+  display: grid; grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 14px; margin-bottom: 18px;
+}
+
+.hero-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 18px 22px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 6px;
+}
+
+.hero-card.hero-in {
+  background: linear-gradient(135deg, var(--green-bg), var(--card));
+  border-left: 3px solid var(--green);
+}
+.hero-card.hero-out {
+  background: linear-gradient(135deg, var(--gold-bg), var(--card));
+  border-left: 3px solid var(--gold);
+}
+
+.hero-label {
+  font-size: 11px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600;
+}
+
+.hero-value {
+  font-size: 40px; font-weight: 800; font-family: var(--mono);
+  color: var(--accent); letter-spacing: -1px; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-value-sm {
+  font-size: 15px; color: var(--text); line-height: 1.45;
+}
+.hero-value-sm strong { color: var(--accent); font-family: var(--mono); }
+
+.hero-sub {
+  font-size: 12px; color: var(--text2); margin-top: 4px;
+}
+
+.hero-foot {
+  font-size: 10.5px; color: var(--text3); margin-top: 10px;
+  padding-top: 8px; border-top: 1px solid var(--border);
+  line-height: 1.4;
+}
+
+.hero-aux {
+  font-size: 11px; color: var(--text3); font-weight: 400;
+}
+
+.chart-subtitle {
+  font-size: 11px; color: var(--text3); font-weight: 400;
+  margin-left: 10px;
+}
+
+.rule-note {
+  color: var(--accent); font-size: 12px;
+  font-family: var(--mono);
+  margin-left: 4px;
+}
+
+.hero-state-badge {
+  font-size: 22px; font-weight: 700; margin-top: 2px;
+}
+.state-in { color: var(--green); }
+.state-out { color: var(--gold); }
+
+/* === Holding card === */
+.info-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 18px 22px; box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+
+.info-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.info-title { font-size: 14px; font-weight: 700; color: var(--text); }
+
+.pnl-badge {
+  padding: 4px 12px; border-radius: 999px;
+  font-size: 13px; font-weight: 700; font-family: var(--mono);
+}
+.pnl-pos { background: var(--green-bg); color: var(--green); }
+.pnl-neg { background: var(--red-bg); color: var(--red); }
+
+.info-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+}
+.info-label {
+  font-size: 11px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+  margin-bottom: 4px;
+}
+.info-val {
+  font-size: 16px; font-weight: 600; color: var(--text);
+}
+.info-val.mono { font-family: var(--mono); }
+
+/* === Stats 网格 === */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 8px; margin-bottom: 18px;
+}
+.stat-cell {
+  background: var(--card); border-radius: var(--radius-sm);
+  padding: 12px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-label {
+  font-size: 10px; color: var(--text3);
+  letter-spacing: 0.6px; margin-bottom: 4px; font-weight: 600;
+}
+.stat-val {
+  font-size: 18px; font-weight: 700; font-family: var(--mono);
+  color: var(--text); letter-spacing: -0.5px;
+}
+.text-red { color: var(--red); }
+.text-green { color: var(--green); }
+
+/* === Chart === */
+.chart-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 20px 22px 12px; box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+.chart-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  margin-bottom: 14px;
+}
+.premium-chart { width: 100%; height: auto; display: block; }
+
+/* === Trades table === */
+.trades-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 18px 22px; box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.trades-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  margin-bottom: 14px;
+}
+.trade-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; font-variant-numeric: tabular-nums;
+}
+.trade-table thead {
+  background: var(--bg);
+}
+.trade-table th {
+  padding: 8px 10px; text-align: left;
+  font-size: 11px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--border);
+}
+.trade-table th.right, .trade-table td.right { text-align: right; }
+.trade-table tbody td {
+  padding: 8px 10px; color: var(--text);
+  border-bottom: 1px solid rgba(28, 24, 20, 0.04);
+}
+.trade-table tbody tr:hover { background: var(--accent-bg); }
+.trade-table .mono { font-family: var(--mono); font-size: 12.5px; }
+.trade-table .open-row {
+  background: var(--gold-bg);
+  font-weight: 600;
+}
+.trade-table .open-row td { color: var(--gold); }
+
+/* 标的切换 tab */
+.symbol-tabs {
+  display: flex; gap: 8px;
+  margin-bottom: 16px;
+}
+.symbol-tab {
+  flex: 1;
+  background: var(--card); border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  text-align: left; cursor: pointer;
+  transition: all 0.16s; font-family: var(--font);
+}
+.symbol-tab:hover {
+  border-color: var(--accent); transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.symbol-tab.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+.symbol-tab-name {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  margin-bottom: 2px;
+}
+.symbol-tab.active .symbol-tab-name { color: var(--accent); }
+.symbol-tab-meta {
+  font-size: 11px; color: var(--text3);
+  font-family: var(--mono);
+}
+
+.freshness-warning {
+  background: var(--red-bg); color: var(--red);
+  padding: 12px 16px; border-radius: 12px;
+  margin: 16px 0; font-weight: 600; font-size: 14px;
+  border-left: 4px solid var(--red);
+}
+
+.freshness-card {
+  background: var(--card); border-radius: var(--radius-sm);
+  padding: 12px 16px; margin-top: 12px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 12px;
+}
+
+.freshness-row {
+  display: grid; grid-template-columns: 130px 1fr 160px 1fr;
+  gap: 8px; align-items: center;
+}
+
+.freshness-row .info-label {
+  font-size: 11px; margin-bottom: 0;
+}
+.freshness-row .info-val {
+  font-size: 12.5px; font-weight: 600;
+}
+
+.footer-note {
+  font-size: 11px; color: var(--text3); text-align: center;
+  margin-top: 14px; line-height: 1.6;
+}
+
+/* === Responsive === */
+@media (max-width: 700px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .info-grid { grid-template-columns: repeat(2, 1fr); }
+}
