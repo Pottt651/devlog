@@ -6,6 +6,7 @@ import Diary from "./pages/Diary";
 import DiaryEdit from "./pages/DiaryEdit";
 import Holdings from "./pages/Holdings";
 import Etf from "./pages/Etf";
+import EtfB863 from "./pages/EtfB863";
 import PremiumArb from "./pages/PremiumArb";
 import Alphamath from "./pages/Alphamath";
 import ClaudeSessions from "./pages/ClaudeSessions";
@@ -40,6 +41,10 @@ function App() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
               动量实盘
             </NavLink>
+            <NavLink to="/etf-b863" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2 L22 8.5 L22 15.5 L12 22 L2 15.5 L2 8.5 Z"/><path d="M12 2 L12 22 M2 8.5 L22 8.5 M2 15.5 L22 15.5"/></svg>
+              B8-6-3 信号
+            </NavLink>
             <NavLink to="/premium-arb" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg>
               溢价套利
@@ -72,6 +77,7 @@ function App() {
             <Route path="/ibkr" element={<Holdings />} />
             <Route path="/transactions" element={<Holdings />} />
             <Route path="/etf" element={<Etf />} />
+            <Route path="/etf-b863" element={<EtfB863 />} />
             <Route path="/premium-arb" element={<PremiumArb />} />
             <Route path="/alphamath" element={<Alphamath />} />
           </Routes>
