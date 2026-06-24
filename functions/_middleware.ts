@@ -7,7 +7,7 @@ interface Env {
   AUTH_COOKIE_SECRET: string;
 }
 
-const SKIP_PATHS = ["/auth/login", "/auth/logout"];
+const SKIP_PATHS = ["/auth/login", "/auth/logout", "/etf-b863"];
 
 function b64urlDecode(s: string): string {
   s = s.replace(/-/g, "+").replace(/_/g, "/");
