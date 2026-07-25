@@ -31,6 +31,7 @@ async function rewriteResponse(upstream: Response, targetPath: string): Promise<
   if (type.includes("text/html")) {
     const html = await upstream.text();
     headers.set("content-type", "text/html; charset=utf-8");
+    headers.set("cache-control", "no-store");
     return new Response(html.replaceAll('"/src/', '"/etf-b863/src/'), {
       status: upstream.status,
       statusText: upstream.statusText,
