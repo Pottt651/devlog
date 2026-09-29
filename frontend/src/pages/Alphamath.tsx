@@ -1,11 +1,9 @@
-import IframeEmbedPage from "../components/IframeEmbedPage";
+import { useEffect } from "react";
 
 export default function Alphamath() {
-  return (
-    <IframeEmbedPage
-      title="AlphaMath 教学"
-      src="https://alphamath.pott1587.xyz"
-      subtitle="高中数学 · 备考资源与讲义"
-    />
-  );
+  useEffect(() => {
+    window.location.replace("/alphamath-app/");
+  }, []);
+
+  return null;
 }

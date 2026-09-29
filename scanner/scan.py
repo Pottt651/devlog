@@ -27,14 +27,19 @@ def run_git(repo_path: Path, *args) -> str:
         return ""
 
 
+# 跳过的项目 (废弃,不再扫描入库)
+SKIP_PROJECTS = {
+    "etf-live-trading",  # 已被 etf-signal-v2 替代
+}
+
 # 手工补充的项目信息（CLAUDE.md/README.md 缺失或不够清晰的项目）
 PROJECT_INFO = {
-    "etf-live-trading": {
-        "name": "ETF 实盘交易系统",
-        "description": "ETF 动量轮动策略的实盘看板 + 信号计算系统。通过 QMT 接入 A 股账户数据，展示持仓、收益、调仓信号。每周五自动计算轮动信号，部署在 Cloudflare Pages 上可随时查看。",
-        "links": {"live": "https://etf.pott1587.xyz", "github": "https://github.com/Pottt651/etf-live-trading"},
-        "tech_stack": ["Python", "Pandas", "AkShare", "Cloudflare Pages", "Supabase"],
-        "related_projects": ["fund_huice_codex", "qmt"],
+    "etf-signal-v2": {
+        "name": "ETF 信号 v2",
+        "description": "ETF 动量轮动信号 + 实盘 P&L 极简看板。每天 30 秒看完今日动量信号 + 实盘盈亏。Cloudflare 全云端 (Worker + KV + Pages),策略口径与 fund_huice_codex 完全对齐。",
+        "links": {"live": "https://etf-signal-d51.pages.dev", "embed": "https://pott1587.xyz/etf"},
+        "tech_stack": ["Cloudflare Worker", "Cloudflare Pages", "KV", "JavaScript"],
+        "related_projects": ["fund_huice_codex"],
     },
     "ibkr": {
         "name": "IBKR 美股账户终端",
@@ -227,6 +232,8 @@ def scan_git_projects() -> dict:
             scan_dirs.append((slug, path))
 
     for slug, item in scan_dirs:
+        if slug in SKIP_PROJECTS:
+            continue
         if not (item / ".git").exists():
             # 无 git 但在 PROJECT_INFO 中的项目，也加入（作为非 git 项目）
             if slug in PROJECT_INFO:
@@ -375,6 +382,8 @@ def scan_claude_history(projects: dict) -> dict:
 
     # 合并到 projects
     for slug, info in by_project.items():
+        if slug in SKIP_PROJECTS:
+            continue
         if slug in projects:
             projects[slug]["claude_sessions"] = len(info["sessions"])
             projects[slug]["claude_messages"] = info["messages"]

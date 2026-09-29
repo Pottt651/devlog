@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AlphaMath Teacher OS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #f5efe6;
+      --panel: rgba(255, 252, 247, 0.92);
+      --card: rgba(255, 255, 255, 0.94);
+      --line: rgba(40, 47, 59, 0.08);
+      --text: #1f2937;
+      --muted: #6b7280;
+      --navy: #1f4c7c;
+      --navy-soft: #e8f1fb;
+      --amber: #c98915;
+      --amber-soft: #fff4de;
+      --green: #2f7d59;
+      --green-soft: #e7f5ed;
+      --stone: #697281;
+      --stone-soft: #eef1f4;
+      --shadow: 0 18px 45px rgba(30, 41, 59, 0.08);
+    }
+
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(31, 76, 124, 0.08), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(201, 137, 21, 0.08), transparent 18%),
+        linear-gradient(180deg, #f8f3eb, #f2ebe1);
+    }
+
+    .glass {
+      background: var(--panel);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow);
+    }
+
+    .lesson-self { background: linear-gradient(135deg, #fff, var(--navy-soft)); border-left: 5px solid var(--navy); }
+    .lesson-org { background: linear-gradient(135deg, #fff, var(--amber-soft)); border-left: 5px solid var(--amber); }
+    .lesson-online { background: linear-gradient(135deg, #fff, var(--green-soft)); border-left: 5px solid var(--green); }
+    .lesson-other { background: linear-gradient(135deg, #fff, var(--stone-soft)); border-left: 5px solid var(--stone); }
+
+    .pill-self { background: var(--navy-soft); color: var(--navy); }
+    .pill-org { background: var(--amber-soft); color: var(--amber); }
+    .pill-online { background: var(--green-soft); color: var(--green); }
+    .pill-other { background: var(--stone-soft); color: var(--stone); }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen">
+    <header class="sticky top-0 z-20 border-b border-white/70 glass">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-xl font-bold">α</div>
+          <div>
+            <div class="text-sm uppercase tracking-[0.18em] text-slate-500">AlphaMath</div>
+            <h1 class="text-xl sm:text-2xl font-bold m-0">Teacher OS</h1>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+          <span id="todayLabel" class="px-3 py-2 rounded-full bg-white/80 border border-slate-200"></span>
+          <button id="prevWeekBtn" class="px-3 py-2 rounded-full bg-white/80 border border-slate-200 hover:bg-white">上一周</button>
+          <button id="nextWeekBtn" class="px-3 py-2 rounded-full bg-white/80 border border-slate-200 hover:bg-white">下一周</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+      <section class="glass rounded-[28px] p-6 sm:p-8">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-500">直接进入后台</div>
+            <h2 class="text-2xl sm:text-3xl font-bold mt-2 mb-2">不登录，直接看你的排课、收款和本周安排</h2>
+            <p class="text-slate-600 max-w-3xl leading-7 m-0">
+              这版已经改成同域免登录后台。数据先走浏览器本地持久化，先把打开就能用这件事解决掉。
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-2 rounded-full bg-white/80 border border-slate-200 text-sm text-slate-600" id="monthLabel"></span>
+            <button id="resetBtn" class="px-3 py-2 rounded-full bg-slate-900 text-white text-sm">重置示例数据</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4" id="metricGrid"></section>
+
+      <section class="card rounded-[28px] p-6 sm:p-7">
+        <div class="flex items-center justify-between gap-3 mb-5">
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-500">本周课表</div>
+            <h3 class="text-xl font-bold mt-2">按颜色区分课程来源</h3>
+          </div>
+          <div class="text-sm text-slate-500" id="weekRangeLabel"></div>
+        </div>
+        <div class="grid gap-3 lg:grid-cols-7" id="weekGrid"></div>
+      </section>
+
+      <section class="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div class="card rounded-[28px] p-6 sm:p-7">
+          <div class="flex items-center justify-between gap-3 mb-5">
+            <div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-500">本月收费</div>
+              <h3 class="text-xl font-bold mt-2">待收与已收</h3>
+            </div>
+            <div class="text-sm text-slate-500">点击按钮登记本月已收</div>
+          </div>
+          <div class="space-y-3" id="billingList"></div>
+        </div>
+
+        <div class="space-y-6">
+          <section class="card rounded-[28px] p-6 sm:p-7">
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-500">提醒</div>
+            <h3 class="text-xl font-bold mt-2 mb-5">本周需要你处理的事</h3>
+            <div class="space-y-3" id="taskList"></div>
+          </section>
+
+          <section class="card rounded-[28px] p-6 sm:p-7">
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-500">学生概览</div>
+            <h3 class="text-xl font-bold mt-2 mb-5">收费规则与固定时段</h3>
+            <div class="space-y-3" id="studentList"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "alphamath-direct-backend-v1";
+    const RENT = 4600;
+    const WEEKDAYS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+    const WEEKDAY_TO_INDEX = { "周一": 1, "周二": 2, "周三": 3, "周四": 4, "周五": 5, "周六": 6, "周日": 0 };
+
+    const RAW_STUDENTS = [
+      { id: "STU-001", name: "宋柳伊", grade: "高三", parent: "杨柳青青", source: "自有学生", mode: "线下", price: 1200, paymentRule: "月底付当月" },
+      { id: "STU-002", name: "林乃天", grade: "高三", parent: "林乃天妈妈", source: "自有学生", mode: "线下", price: 1200, paymentRule: "月底付下月月初" },
+      { id: "STU-003", name: "刘明逸", grade: "高三", parent: "刘明逸妈妈", source: "自有学生", mode: "线下", price: 1200, paymentRule: "月底付下月月初" },
+      { id: "STU-004", name: "李怡萍", grade: "高三", parent: "李怡萍妈妈", source: "自有学生", mode: "线下", price: 1200, paymentRule: "月底付下月月初" },
+      { id: "STU-005", name: "顾文芊", grade: "8年级", parent: "顾文芊妈妈", source: "自有学生", mode: "线下", price: 1200, paymentRule: "月底付当月" },
+      { id: "STU-006", name: "张皓然", grade: "高三", parent: "张皓然妈妈", source: "自有学生", mode: "线下", price: 1200, paymentRule: "月底付下月月初" },
+      { id: "STU-007", name: "和其光", grade: "高三", parent: "和其光妈妈", source: "自有学生", mode: "线下", price: 1200, paymentRule: "月底付下月月初" },
+      { id: "STU-008", name: "elvin", grade: "3年级", parent: "elvin妈妈", source: "机构课", mode: "线下", price: 750, paymentRule: "机构下月月初统一付费" },
+      { id: "STU-009", name: "aidan", grade: "5年级", parent: "aidan妈妈", source: "机构课", mode: "线下", price: 750, paymentRule: "机构下月月初统一付费" },
+      { id: "STU-010", name: "lareina", grade: "1年级", parent: "lareina妈妈", source: "机构课", mode: "线下", price: 500, paymentRule: "机构下月月初统一付费" },
+      { id: "STU-011", name: "沙楷欣", grade: "高三", parent: "", source: "自有学生", mode: "线下", price: 1400, paymentRule: "月底付下月月初" },
+      { id: "STU-012", name: "serina", grade: "7年级", parent: "serina妈妈", source: "线上课", mode: "线上", price: 500, paymentRule: "每周第一次课后付当周费用" }
+    ];
+
+    const RAW_RULES = [
+      { studentId: "STU-001", weekday: "周六", start: "13:00", end: "15:00" },
+      { studentId: "STU-002", weekday: "周六", start: "15:00", end: "17:00" },
+      { studentId: "STU-003", weekday: "周五", start: "19:45", end: "21:45" },
+      { studentId: "STU-004", weekday: "周五", start: "17:45", end: "19:45" },
+      { studentId: "STU-005", weekday: "周六", start: "09:00", end: "11:00" },
+      { studentId: "STU-006", weekday: "周六", start: "11:00", end: "13:00" },
+      { studentId: "STU-007", weekday: "周日", start: "10:00", end: "12:00" },
+      { studentId: "STU-008", weekday: "周日", start: "15:30", end: "17:00" },
+      { studentId: "STU-009", weekday: "周日", start: "14:00", end: "15:30" },
+      { studentId: "STU-010", weekday: "周二", start: "17:00", end: "18:00" },
+      { studentId: "STU-011", weekday: "周六", start: "17:00", end: "19:00" },
+      { studentId: "STU-012", weekday: "周二", start: "20:30", end: "21:30" },
+      { studentId: "STU-012", weekday: "周三", start: "20:30", end: "21:30" }
+    ];
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat("zh-CN").format(Number(value || 0));
+    }
+
+    function formatDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function parseDate(value) {
+      const [y, m, d] = value.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function startOfWeek(date) {
+      const copy = new Date(date);
+      const day = copy.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      copy.setDate(copy.getDate() + diff);
+      copy.setHours(0, 0, 0, 0);
+      return copy;
+    }
+
+    function addDays(date, days) {
+      const copy = new Date(date);
+      copy.setDate(copy.getDate() + days);
+      return copy;
+    }
+
+    function daysInMonth(year, monthIndex) {
+      return new Date(year, monthIndex + 1, 0).getDate();
+    }
+
+    function getCollectionDate(rule, monthKey, lessonDates) {
+      const [year, month] = monthKey.split("-").map(Number);
+      const lastDay = new Date(year, month, 0);
+      if (rule === "月底付当月") return formatDate(lastDay);
+      if (rule === "每周第一次课后付当周费用") return lessonDates[0] || `${monthKey}-01`;
+      return formatDate(new Date(year, month, 1));
+    }
+
+    function createInitialState() {
+      return {
+        payments: {},
+        weekAnchor: formatDate(new Date())
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : createInitialState();
+      } catch {
+        return createInitialState();
+      }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function getLessonTone(source) {
+      if (source === "机构课") return "org";
+      if (source === "线上课") return "online";
+      if (source === "其他") return "other";
+      return "self";
+    }
+
+    function generateMonthLessons(monthKey) {
+      const [year, month] = monthKey.split("-").map(Number);
+      const totalDays = daysInMonth(year, month - 1);
+      const studentsById = Object.fromEntries(RAW_STUDENTS.map((student) => [student.id, student]));
+      const lessons = [];
+
+      for (const rule of RAW_RULES) {
+        const targetDay = WEEKDAY_TO_INDEX[rule.weekday];
+        for (let day = 1; day <= totalDays; day += 1) {
+          const date = new Date(year, month - 1, day);
+          if (date.getDay() !== targetDay) continue;
+          const student = studentsById[rule.studentId];
+          lessons.push({
+            id: `${rule.studentId}-${formatDate(date)}-${rule.start}`,
+            date: formatDate(date),
+            start: rule.start,
+            end: rule.end,
+            studentId: student.id,
+            studentName: student.name,
+            grade: student.grade,
+            source: student.source,
+            paymentRule: student.paymentRule
+          });
+        }
+      }
+
+      return lessons.sort((a, b) => {
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return a.start.localeCompare(b.start);
+      });
+    }
+
+    function getBillings(monthKey, lessons, state) {
+      return RAW_STUDENTS.map((student) => {
+        const studentLessons = lessons.filter((lesson) => lesson.studentId === student.id);
+        const expectedAmount = studentLessons.length * student.price;
+        const paymentKey = `${monthKey}:${student.id}`;
+        const receivedAmount = state.payments[paymentKey]?.amount || 0;
+        return {
+          student,
+          count: studentLessons.length,
+          expectedAmount,
+          receivedAmount,
+          dueDate: getCollectionDate(student.paymentRule, monthKey, studentLessons.map((item) => item.date))
+        };
+      }).sort((a, b) => (b.expectedAmount - b.receivedAmount) - (a.expectedAmount - a.receivedAmount));
+    }
+
+    function render() {
+      const state = loadState();
+      const today = new Date();
+      const monthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+      const lessons = generateMonthLessons(monthKey);
+      const billings = getBillings(monthKey, lessons, state);
+      const weekAnchor = parseDate(state.weekAnchor);
+      const weekStart = startOfWeek(weekAnchor);
+      const weekDates = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+      const weekLessons = lessons.filter((lesson) => {
+        const d = parseDate(lesson.date);
+        return d >= weekDates[0] && d <= weekDates[6];
+      });
+      const expected = billings.reduce((sum, item) => sum + item.expectedAmount, 0);
+      const received = billings.reduce((sum, item) => sum + item.receivedAmount, 0);
+      const lessonCount = lessons.length;
+
+      document.getElementById("todayLabel").textContent = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+      document.getElementById("monthLabel").textContent = `${today.getFullYear()}年${today.getMonth() + 1}月`;
+      document.getElementById("weekRangeLabel").textContent = `${weekDates[0].getMonth() + 1}月${weekDates[0].getDate()}日 - ${weekDates[6].getMonth() + 1}月${weekDates[6].getDate()}日`;
+
+      document.getElementById("metricGrid").innerHTML = [
+        { label: "本月课次", value: lessonCount, tone: "navy", note: "按固定规则自动生成" },
+        { label: "本月应收", value: `¥${formatMoney(expected)}`, tone: "amber", note: "根据单节费用计算" },
+        { label: "本月已收", value: `¥${formatMoney(received)}`, tone: "green", note: "本地登记收款" },
+        { label: "房租后预计", value: `¥${formatMoney(expected - RENT)}`, tone: "stone", note: "按固定房租 4600" }
+      ].map((item) => {
+        const border = item.tone === "navy" ? "border-slate-900" : item.tone === "amber" ? "border-amber-500" : item.tone === "green" ? "border-emerald-600" : "border-slate-500";
+        return `
+          <article class="card rounded-[24px] p-5 border-t-4 ${border}">
+            <div class="text-sm text-slate-500">${item.label}</div>
+            <div class="text-3xl sm:text-4xl font-black mt-4">${item.value}</div>
+            <div class="text-sm text-slate-500 mt-3">${item.note}</div>
+          </article>
+        `;
+      }).join("");
+
+      document.getElementById("weekGrid").innerHTML = weekDates.map((date) => {
+        const key = formatDate(date);
+        const items = weekLessons.filter((lesson) => lesson.date === key);
+        return `
+          <div class="rounded-[22px] border border-slate-200 bg-slate-50/80 overflow-hidden min-h-[220px]">
+            <div class="px-4 py-3 border-b border-slate-200 bg-white/70">
+              <div class="text-xs uppercase tracking-[0.16em] text-slate-500">${WEEKDAYS[date.getDay()]}</div>
+              <div class="text-sm font-bold mt-1">${date.getMonth() + 1}-${date.getDate()}</div>
+            </div>
+            <div class="p-3 space-y-3">
+              ${items.length ? items.map((lesson) => `
+                <article class="rounded-2xl p-3 lesson-${getLessonTone(lesson.source)}">
+                  <div class="flex items-start justify-between gap-2">
+                    <div class="font-semibold text-sm">${lesson.studentName}</div>
+                    <div class="text-xs text-slate-500">${lesson.start}</div>
+                  </div>
+                  <div class="text-xs text-slate-500 mt-2">${lesson.start} - ${lesson.end}</div>
+                  <div class="mt-2 inline-flex px-2 py-1 rounded-full text-xs font-medium pill-${getLessonTone(lesson.source)}">${lesson.source}</div>
+                </article>
+              `).join("") : `<div class="rounded-2xl border border-dashed border-slate-200 bg-white/70 p-4 text-center text-sm text-slate-400">空档</div>`}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("billingList").innerHTML = billings.map((item) => {
+        const paymentKey = `${monthKey}:${item.student.id}`;
+        const isPaid = item.receivedAmount >= item.expectedAmount && item.expectedAmount > 0;
+        return `
+          <article class="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <div class="font-semibold">${item.student.name}</div>
+                  <span class="px-2 py-1 rounded-full text-xs ${isPaid ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}">${isPaid ? "已收" : "待收"}</span>
+                </div>
+                <div class="text-sm text-slate-500 mt-2">${item.count} 节 · 单节 ¥${formatMoney(item.student.price)} · ${item.student.paymentRule}</div>
+                <div class="text-sm text-slate-500 mt-1">预计收款日：${item.dueDate}</div>
+              </div>
+              <div class="flex items-center gap-3 sm:flex-col sm:items-end">
+                <div class="text-right">
+                  <div class="text-xs text-slate-500">应收</div>
+                  <div class="text-xl font-black">¥${formatMoney(item.expectedAmount)}</div>
+                </div>
+                <button
+                  data-payment-key="${paymentKey}"
+                  data-student-id="${item.student.id}"
+                  data-amount="${item.expectedAmount}"
+                  class="record-payment px-3 py-2 rounded-full text-sm ${isPaid ? "bg-slate-200 text-slate-500" : "bg-slate-900 text-white"}"
+                  ${isPaid ? "disabled" : ""}
+                >
+                  ${isPaid ? "已登记" : "登记为已收"}
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      document.getElementById("taskList").innerHTML = billings
+        .filter((item) => item.expectedAmount > item.receivedAmount)
+        .slice(0, 6)
+        .map((item) => `
+          <article class="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="font-semibold">${item.student.name}</div>
+                <div class="text-sm text-slate-500 mt-1">未收 ¥${formatMoney(item.expectedAmount - item.receivedAmount)}</div>
+              </div>
+              <div class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">${item.dueDate}</div>
+            </div>
+          </article>
+        `).join("") || `<div class="rounded-[22px] border border-dashed border-slate-200 bg-slate-50/70 p-5 text-sm text-slate-400 text-center">本月待收项已经清空。</div>`;
+
+      document.getElementById("studentList").innerHTML = RAW_STUDENTS.map((student) => {
+        const ruleText = RAW_RULES.filter((rule) => rule.studentId === student.id)
+          .map((rule) => `${rule.weekday} ${rule.start}-${rule.end}`)
+          .join(" · ");
+        return `
+          <article class="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="font-semibold">${student.name}</div>
+                <div class="text-sm text-slate-500 mt-1">${student.grade || "未标注年级"} · ${student.parent || "未写家长称呼"}</div>
+                <div class="text-sm text-slate-500 mt-1">${ruleText}</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs text-slate-500">${student.source}</div>
+                <div class="text-sm font-bold mt-1">¥${formatMoney(student.price)}/节</div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".record-payment").forEach((button) => {
+        button.addEventListener("click", () => {
+          const currentState = loadState();
+          const key = button.dataset.paymentKey;
+          currentState.payments[key] = {
+            amount: Number(button.dataset.amount),
+            recordedAt: new Date().toISOString()
+          };
+          saveState(currentState);
+          render();
+        });
+      });
+    }
+
+    document.getElementById("prevWeekBtn").addEventListener("click", () => {
+      const state = loadState();
+      state.weekAnchor = formatDate(addDays(parseDate(state.weekAnchor), -7));
+      saveState(state);
+      render();
+    });
+
+    document.getElementById("nextWeekBtn").addEventListener("click", () => {
+      const state = loadState();
+      state.weekAnchor = formatDate(addDays(parseDate(state.weekAnchor), 7));
+      saveState(state);
+      render();
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    });
+
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      saveState(createInitialState());
+    }
+
+    render();
+  </script>
+</body>
+</html>
