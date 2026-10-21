@@ -1,0 +1,7 @@
+{
+  "name": "devlog",
+  "compatibility_date": "2026-09-14",
+  "pages_build_output_dir": "./dist",
+  "d1_databases": [{"binding":"DB","database_name":"devlog-db","database_id":"38c88088-af40-4168-83b2-d73f079d8bae"}],
+  "services": [{"binding":"ETF_SERVICE","service":"etf-b863"},{"binding":"MAILER","service":"pott-login-mailer"}]
+}

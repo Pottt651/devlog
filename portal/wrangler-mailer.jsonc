@@ -1,0 +1,8 @@
+{
+  "name":"pott-login-mailer",
+  "main":"./mailer.mjs",
+  "compatibility_date":"2026-09-15",
+  "workers_dev":false,
+  "preview_urls":false,
+  "send_email":[{"name":"EMAIL","destination_address":"richermoon8050@gmail.com"}]
+}
